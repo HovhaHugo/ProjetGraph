@@ -139,12 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CException.cpp" />
     <ClCompile Include="CGraph.cpp" />
     <ClCompile Include="CLink.cpp" />
     <ClCompile Include="CNode.cpp" />
     <ClCompile Include="ProjetGraph.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CException.h" />
     <ClInclude Include="CGraph.h" />
     <ClInclude Include="CLink.h" />
     <ClInclude Include="CNode.h" />
