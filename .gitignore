@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+/.vs
+/ProjetGraph/.vs/ProjetGraph/v16
+/ProjetGraph/ProjetGraph/x64/Debug
+/ProjetGraph/x64/Debug

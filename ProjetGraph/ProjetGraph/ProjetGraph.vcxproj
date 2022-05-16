@@ -139,7 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CGraph.cpp" />
+    <ClCompile Include="CLink.cpp" />
+    <ClCompile Include="CNode.cpp" />
     <ClCompile Include="ProjetGraph.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CGraph.h" />
+    <ClInclude Include="CLink.h" />
+    <ClInclude Include="CNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
