@@ -20,6 +20,8 @@ public:
 	CNode(CNode* pNODToCopy);
 	~CNode();
 
+	CNode* operator=(CNode* pNODToCopy);
+
 	//Methods
 	void NODShow();
 	CLink* NODGetLinkTowardNode(unsigned int uiDestination);

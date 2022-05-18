@@ -4,6 +4,7 @@
 //propose
 #include "CGraph.h"
 #include "CException.h"
+#include <malloc.h>
 
 
 /**
@@ -41,6 +42,20 @@ CGraph::CGraph(char* pcFilePath) {
 CGraph::~CGraph() {
     pNODGRANodeList = nullptr;
     uiGRASize = 0;
+}
+
+
+/**
+ * Constructor by copy of CGraph
+ * Input: /
+ * Output: /
+ * Precondition : /
+ * Postcondition : the object has been created in memory with this = pGRAToCopy
+ */
+CGraph::CGraph(CGraph* pGRAToCopy) {
+    uiGRASize = pGRAToCopy->uiGRASize;
+    pNODGRANodeList = pGRAToCopy->pNODGRANodeList;
+    bGRAIsOriented = pGRAToCopy->bGRAIsOriented;
 }
 
 
@@ -171,7 +186,7 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
 void CGraph::GRAAddNode(CNode& NODParam) {
 
     uiGRASize++;
-    pNODGRANodeList = realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
+    pNODGRANodeList = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
     pNODGRANodeList[uiGRASize - 1] = NODParam;
 
 }
@@ -267,7 +282,7 @@ void CGraph::GRARemoveNode(unsigned int uiValue) {
     delete pNODFound;
 
     uiGRASize--;
-    pNODGRANodeList = realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
+    pNODGRANodeList = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
 
 }
 
