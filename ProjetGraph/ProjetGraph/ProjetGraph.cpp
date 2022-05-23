@@ -2,10 +2,20 @@
 //
 
 #include <iostream>
+#include "CGraph.h"
 
 int main()
 {
     std::cout << "Hello World!\n";
+    CGraph* test = new CGraph();
+    CNode node1 = new CNode(1);
+    CNode node2 = new CNode(2);
+    test->GRAAddNode(node1);
+    test->GRAAddNode(node2);
+    test->GRAAddLinkBetweenNode(1, 2);
+    test->GRAShow();
+    test->GRAAddLinkBetweenNode(2, 1);
+    test->GRAShow();
 }
 
 // Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage

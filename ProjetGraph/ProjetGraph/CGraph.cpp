@@ -12,8 +12,9 @@
  * Postcondition : the object has been created in memory with uiGRASize = 0 and pNODGRANodeList = nullptr
  */
 CGraph::CGraph() {
-    pNODGRANodeList = nullptr;
     uiGRASize = 0;
+    pNODGRANodeList = (CNode*)malloc(sizeof(CNode) * uiGRASize);
+    bGRAIsOriented = false;
 }
 
 
@@ -43,12 +44,19 @@ CGraph::CGraph(char* pcFilePath) {
     CNode* pNODNodeList = pPARParser->PARGetNodes(uiNbOfNode);
 
     int* piListLinkFrom = (int*)malloc(sizeof(int) * uiNbOfLink);
+    if (piListLinkFrom == nullptr)
+        throw CException();
+
     int* piListLinkTo = (int*)malloc(sizeof(int) * uiNbOfLink);
+    if (piListLinkTo == nullptr) {
+        free(piListLinkFrom);
+        throw CException();
+    }
 
     pPARParser->PARGetLink(piListLinkFrom, piListLinkTo, uiNbOfLink);
 
     for (unsigned int uiLoop = 0; uiLoop < uiNbOfLink; uiLoop++) {
-        GRAAddLinkBetweenNode(piListLinkFrom[uiLoop], piListLinkTo[uiLoop]);
+        GRAAddLinkBetweenNode(*(piListLinkFrom+uiLoop), *(piListLinkTo + uiLoop));
     }
 
 
@@ -63,7 +71,7 @@ CGraph::CGraph(char* pcFilePath) {
  * Postcondition : the object has been deleted from memory
  */
 CGraph::~CGraph() {
-    pNODGRANodeList = nullptr;
+    delete pNODGRANodeList;
     uiGRASize = 0;
 }
 
@@ -186,7 +194,7 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
             pLINLinkToRemoveBack = pcDestination->NODGetLinkTowardNode(uiValueNodeSource);
             pcDestination->NODRemoveOutputLink(*pLINLinkToRemoveBack);
             pcSource->NODRemoveInputLink(*pLINLinkToRemoveBack);
-            delete pLINLinkToRemove;
+            delete pLINLinkToRemoveBack;
         }
         catch (CException EXCError) {
             throw EXCError;
@@ -196,6 +204,13 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
     }
 
 }
+
+
+void CGraph::GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int uiVNodeOldDestination, unsigned int uiVNodeNewDestination) {
+
+
+}
+
 
 
 /**
@@ -209,7 +224,11 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
 void CGraph::GRAAddNode(CNode& NODParam) {
 
     uiGRASize++;
-    pNODGRANodeList = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
+    CNode* pNODTemp = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
+    if (pNODTemp == nullptr) {
+        throw CException();
+    }
+    pNODGRANodeList = pNODTemp;
     pNODGRANodeList[uiGRASize - 1] = NODParam;
 
 }
@@ -232,7 +251,7 @@ void CGraph::GRARemoveNode(unsigned int uiValue) {
             pNODFound = (pNODGRANodeList + uiLoop);
         }
     }
-    if (pNODFound == false) {
+    if (pNODFound == nullptr) {
         throw CException(EXCEPTION_NODE_NOT_FOUND);
     }
 
@@ -305,7 +324,11 @@ void CGraph::GRARemoveNode(unsigned int uiValue) {
     delete pNODFound;
 
     uiGRASize--;
-    pNODGRANodeList = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
+    CNode* pNODTemp = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
+    if (pNODTemp == nullptr) {
+        throw CException();
+    }
+    pNODGRANodeList = pNODTemp;
 
 }
 

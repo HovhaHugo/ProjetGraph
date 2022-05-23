@@ -3,6 +3,8 @@
 #include "CNode.h"
 #include <fstream>
 
+#pragma warning(disable: 4996)
+
 #define EXCEPTION_ConversionError 2		//Conversion error, a letter was read instead of a number
 #define EXCEPTION_MissingFile 4			//The file was not found
 #define EXCEPTION_ErrorDataFile 4		//Error from data in the file

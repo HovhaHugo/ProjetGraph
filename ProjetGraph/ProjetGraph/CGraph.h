@@ -22,6 +22,7 @@ public:
 	CGraph* GRAInverse();
 	void GRAAddLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int uiValueNodeDestination);
 	void GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int uiValueNodeDestination);
+	void GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int uiVNodeOldDestination, unsigned int uiVNodeNewDestination);
 	void GRAAddNode(CNode& NODParam);
 	void GRARemoveNode(unsigned int uiValue);
 
