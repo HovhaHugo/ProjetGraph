@@ -83,6 +83,47 @@ CGraph::CGraph(CGraph* pGRAToCopy) {
 
 
 /**
+ * Function that inverte a graph (mean that each arc change their start for their beginging)
+ * Input: /
+ * Output: /
+ * Precondition : /
+ * Postcondition : the grpah has been inverted
+ */
+CGraph* CGraph::GRAInverse() {
+    //We create a new object
+    CGraph* newGraph = new CGraph();
+
+    newGraph->bGRAIsOriented = GRAGetIsOriented();
+    unsigned int uiSize = 0;
+    GRAGetNode(uiSize);
+
+    //For each node, we recopy them all in the new graph
+    for (unsigned int uiLoopNode; uiLoopNode < uiSize; uiLoopNode++) {
+        CNode newNode = new CNode(GRAGetNode(uiLoopNode)->NODGetValue());
+        newGraph->GRAAddNode(newNode);
+
+        //For each input on the node, we add the link reversed une our graph
+        unsigned int uiSizeLinkInput = 0;
+        CLink** ppLINInputLink = GRAGetNode(uiLoopNode)->NODGetInputLink(&uiSizeLinkInput);
+        for (unsigned int uiLoopLinkInput; uiLoopLinkInput < uiSizeLinkInput; uiLoopLinkInput++) {
+            unsigned int uiEnd = ppLINInputLink[uiLoopLinkInput]->LINGetEnd();
+            newGraph->GRAAddLinkBetweenNode(uiLoopNode, uiEnd);
+        }
+
+        //For each output on the node, we add the link reversed une our graph
+        unsigned int uiSizeLinkOutput = 0;
+        GRAGetNode(uiLoopNode)->NODGetOutputLink(&uiSizeLinkOutput);
+        CLink** ppLINOutputLink = GRAGetNode(uiLoopNode)->NODGetInputLink(&uiSizeLinkInput);
+        for (unsigned int uiLoopLinkOutput; uiLoopLinkOutput < uiSizeLinkOutput; uiLoopLinkOutput++) {
+            unsigned int uiEnd = ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd();
+            newGraph->GRAAddLinkBetweenNode(uiEnd, uiLoopNode);
+        }
+    }
+    return newGraph;
+}
+
+
+/**
  * Show a graph
  * Input: /
  * Output: /
