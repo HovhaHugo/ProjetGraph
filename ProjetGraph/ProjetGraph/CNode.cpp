@@ -70,15 +70,6 @@ CNode::~CNode() {
 
 // ******************* END OF CONSTRUCTORS / DESTRUCTOR		************************* //
 
-CNode* CNode::operator=(CNode* pNODToCopy) {
-	CNode* pNODNewNode = new CNode(pNODToCopy->NODGetValue());
-
-	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetInputLink(&pNODNewNode->uiNODInputSize);
-	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetOutputLink(&pNODNewNode->uiNODOutputSize);
-
-	return pNODNewNode;
-}
-
 // ******************* METHODS								************************* //
 
 
@@ -138,7 +129,14 @@ CLink* CNode::NODGetLinkTowardNode(unsigned int uiDestination) {
 
 // ******************* OVERLOADED OPERATOR					************************* //
 
+CNode* CNode::operator=(CNode* pNODToCopy) {
+	CNode* pNODNewNode = new CNode(pNODToCopy->NODGetValue());
 
+	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetInputLink(&pNODNewNode->uiNODInputSize);
+	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetOutputLink(&pNODNewNode->uiNODOutputSize);
+
+	return pNODNewNode;
+}
 
 // ******************* END OF OVERLOADED OPERATOR			************************* //
 
