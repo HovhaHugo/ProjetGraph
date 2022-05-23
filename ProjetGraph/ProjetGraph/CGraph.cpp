@@ -1,8 +1,5 @@
-
-//Le prof a dit a un eleve que pour supprimer un arc c'est le graphe qui s'en occupait, qu'il possedait une liste
-//d'arc. Il a dit que c'etait pas du tout logique mais que c'etait sa solution par rapport au sujet tel qui est
-//propose
 #include "CGraph.h"
+#include "CParser.h"
 #include "CException.h"
 
 
@@ -28,6 +25,32 @@ CGraph::CGraph() {
  */
 CGraph::CGraph(char* pcFilePath) {
     //Appel du parseur
+    CParser* pPARParser;
+    try {
+        pPARParser = new CParser(pcFilePath);
+    }
+    catch (CException EXCError) {
+        throw EXCError;
+    }
+
+    //The parser doesn't know if the graph is oriented
+    bGRAIsOriented = false;
+
+    unsigned int uiNbOfNode = pPARParser->PARGetNumber("SOMMETS");
+    unsigned int uiNbOfLink = pPARParser->PARGetNumber("LIENS");
+
+    CNode* pNODNodeList = pPARParser->PARGetNodes(uiNbOfNode);
+
+    int* piListLinkFrom = (int*)malloc(sizeof(int) * uiNbOfLink);
+    int* piListLinkTo = (int*)malloc(sizeof(int) * uiNbOfLink);
+
+    pPARParser->PARGetLink(piListLinkFrom, piListLinkTo, uiNbOfLink);
+
+    for (unsigned int uiLoop = 0; uiLoop < uiNbOfLink; uiLoop++) {
+        GRAAddLinkBetweenNode(piListLinkFrom[uiLoop], piListLinkTo[uiLoop]);
+    }
+
+
 }
 
 
