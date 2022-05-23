@@ -21,6 +21,19 @@ CNode::CNode() {
 	ppLINNODOutputLink = (CLink**)malloc(uiNODInputSize * sizeof(CLink*));
 }
 
+/**
+ * Constructor by cipy of CNode
+ * Input: pNODToCopy: CNode
+ * Output: /
+ * Precondition : /
+ * Postcondition : the object has been created in memory with this = pNODToCopy
+ */
+CNode::CNode(CNode* pNODToCopy) {
+	uiNODValue = pNODToCopy->NODGetValue();
+	ppLINNODInputLink = pNODToCopy->NODGetInputLink(&uiNODInputSize);
+	ppLINNODOutputLink = pNODToCopy->NODGetOutputLink(&uiNODOutputSize);
+}
+
 
 /**
  * Constructor of CNode
@@ -56,6 +69,15 @@ CNode::~CNode() {
 }
 
 // ******************* END OF CONSTRUCTORS / DESTRUCTOR		************************* //
+
+CNode* CNode::operator=(CNode* pNODToCopy) {
+	CNode* pNODNewNode = new CNode(pNODToCopy->NODGetValue());
+
+	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetInputLink(&pNODNewNode->uiNODInputSize);
+	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetOutputLink(&pNODNewNode->uiNODOutputSize);
+
+	return pNODNewNode;
+}
 
 // ******************* METHODS								************************* //
 
@@ -111,6 +133,14 @@ CLink* CNode::NODGetLinkTowardNode(unsigned int uiDestination) {
 	return pLINFound;
 
 }
+
+// ******************* END OF METHODS						************************* //
+
+// ******************* OVERLOADED OPERATOR					************************* //
+
+
+
+// ******************* END OF OVERLOADED OPERATOR			************************* //
 
 
 // ******************* INPUTLINK / OUTPUTLINK MANAGEMENT		********************* //
