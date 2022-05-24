@@ -8,10 +8,10 @@ int main()
 {
     std::cout << "Hello World!\n";
     CGraph* test = new CGraph();
-    CNode node1 = new CNode(1);
-    CNode node2 = new CNode(2);
-    test->GRAAddNode(node1);
-    test->GRAAddNode(node2);
+    //CNode node1 = new CNode(1);
+    //CNode node2 = new CNode(2);
+    test->GRAAddNode(1);
+    test->GRAAddNode(2);
     test->GRAAddLinkBetweenNode(1, 2);
     test->GRAShow();
     test->GRAAddLinkBetweenNode(2, 1);

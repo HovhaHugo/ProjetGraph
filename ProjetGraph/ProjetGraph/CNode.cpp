@@ -78,23 +78,26 @@ CNode::~CNode() {
  * Input: /
  * Output: /
  * Precondition : /
- * Postcondition : The node value and only output links are displayed
+ * Postcondition : The node is shown in the console
  */
 void CNode::NODShow() {
 	cout << "Noeud de valeur : " << uiNODValue << endl;
+
+	cout << "Lien(s) d'entrée :" << endl;
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+		ppLINNODInputLink[uiLoop]->LINShow();
+	}
 
 	cout << "Lien(s) de sortie :" << endl;
 	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
 		ppLINNODOutputLink[uiLoop]->LINShow();
 	}
 
-	cout << endl;
-
 }
 
 
 /**
- * Lets you know if the node contains a link to another node
+ * Lets you know if the node contains a link to another node in particular
  * Input: uiDestination : unsigned int
  * Output: CLink*
  * Precondition : /
@@ -201,7 +204,7 @@ void CNode::NODRemoveInputLink(CLink& pLINParam) {
 	unsigned int indexFound = 0;
 
 	bool bFound = false;
-	for (int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
 		if (ppLINNODInputLink[uiLoop] == &pLINParam) {
 			indexFound = uiLoop;
 			bFound = true;
@@ -211,7 +214,7 @@ void CNode::NODRemoveInputLink(CLink& pLINParam) {
 		//lancer une erreur, ou avoir une valeur de retour en bool
 	}
 
-	for (int uiLoop = indexFound; uiLoop < uiNODInputSize - 1; uiLoop++) {
+	for (unsigned int uiLoop = indexFound; uiLoop < uiNODInputSize - 1; uiLoop++) {
 		ppLINNODInputLink[uiLoop] = ppLINNODInputLink[uiLoop + 1];
 	}
 
@@ -242,7 +245,7 @@ void CNode::NODRemoveOutputLink(CLink& pLINParam) {
 	unsigned int indexFound = 0;
 
 	bool bFound = false;
-	for (int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
+	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
 		if (ppLINNODOutputLink[uiLoop] == &pLINParam) {
 			indexFound = uiLoop;
 			bFound = true;
@@ -252,7 +255,7 @@ void CNode::NODRemoveOutputLink(CLink& pLINParam) {
 		//lancer une erreur, ou avoir une valeur de retour en bool
 	}
 
-	for (int uiLoop = indexFound; uiLoop < uiNODOutputSize - 1; uiLoop++) {
+	for (unsigned unsigned int uiLoop = indexFound; uiLoop < uiNODOutputSize - 1; uiLoop++) {
 		ppLINNODOutputLink[uiLoop] = ppLINNODInputLink[uiLoop + 1];
 	}
 
@@ -289,17 +292,11 @@ unsigned int CNode::NODGetValue() {
  * Setter of uiNODValue
  * Input: uiValue: unsigned int
  * Output: /
- * Precondition : All the links concerning this node must be modified before,
-	otherwise modifying the value may make the graph unstable and cause bugs
- * Postcondition : uiNODValue = uiValue and all input links have been updated
+ * Precondition : /
+ * Postcondition : uiNODValue = uiValue
  */
 void CNode::NODSetValue(unsigned int uiValue) {
 	uiNODValue = uiValue;
-
-	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
-		ppLINNODInputLink[uiLoop]->LINSetEnd(uiValue);
-	}
-
 }
 
 
@@ -314,7 +311,6 @@ CLink** CNode::NODGetInputLink(unsigned int* uiSize) {
 	*uiSize = uiNODInputSize;
 	return ppLINNODInputLink;
 }
-
 
 /**
  * Getter of ppLINNODOutputLink
