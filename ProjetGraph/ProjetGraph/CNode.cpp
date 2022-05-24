@@ -78,20 +78,17 @@ CNode::~CNode() {
  * Input: /
  * Output: /
  * Precondition : /
- * Postcondition : The node is shown in the console
+ * Postcondition : The node value and only output links are displayed
  */
 void CNode::NODShow() {
 	cout << "Noeud de valeur : " << uiNODValue << endl;
-
-	cout << "Lien(s) d'entrée :" << endl;
-	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
-		ppLINNODInputLink[uiLoop]->LINShow();
-	}
 
 	cout << "Lien(s) de sortie :" << endl;
 	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
 		ppLINNODOutputLink[uiLoop]->LINShow();
 	}
+
+	cout << endl;
 
 }
 
