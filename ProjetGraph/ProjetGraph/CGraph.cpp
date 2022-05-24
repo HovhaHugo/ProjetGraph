@@ -38,11 +38,12 @@ CGraph::CGraph(char* pcFilePath) {
     //The parser doesn't know if the graph is oriented
     bGRAIsOriented = false;
 
-    unsigned int uiNbOfNode = pPARParser->PARGetNumber("SOMMETS");
-    unsigned int uiNbOfLink = pPARParser->PARGetNumber("LIENS");
+    unsigned int uiNbOfNode = pPARParser->PARGetNumber("NBSommets");
+    unsigned int uiNbOfLink = pPARParser->PARGetNumber("NBArcs");
 
     CNode* pNODNodeList = pPARParser->PARGetNodes(uiNbOfNode);
 
+    //temporary lists of link data are created in memory 
     int* piListLinkFrom = (int*)malloc(sizeof(int) * uiNbOfLink);
     if (piListLinkFrom == nullptr)
         throw CException();
@@ -53,12 +54,19 @@ CGraph::CGraph(char* pcFilePath) {
         throw CException();
     }
 
+    //Fille the previous lists
     pPARParser->PARGetLink(piListLinkFrom, piListLinkTo, uiNbOfLink);
 
-    for (unsigned int uiLoop = 0; uiLoop < uiNbOfLink; uiLoop++) {
-        GRAAddLinkBetweenNode(*(piListLinkFrom+uiLoop), *(piListLinkTo + uiLoop));
+    //Add link between the nodes
+    try {
+        for (unsigned int uiLoop = 0; uiLoop < uiNbOfLink; uiLoop++) {
+            GRAAddLinkBetweenNode(*(piListLinkFrom + uiLoop), *(piListLinkTo + uiLoop));
+        }
     }
-
+    catch (CException EXCError) {
+        throw EXCError;
+    }
+   
 
 }
 

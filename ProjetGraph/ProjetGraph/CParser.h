@@ -10,7 +10,7 @@
 #define EXCEPTION_ErrorDataFile 4		//Error from data in the file
 #define EXCEPTION_Parser_not_init 5
 #define EXCEPTION_MallocError 6			//Memory allocation error
-#define EXCEPTION_invalide_node_number 7
+#define EXCEPTION_invalide_number 7
 
 #define LINE_LENGTH 255
 
@@ -21,7 +21,6 @@ class CParser
 
 private:
 	char* pcPARFilePath;
-	bool bPARInitialized = false;
 	const char cPARSeparator = '=';
 	void PARToUpper(char* pcOutput, const char* pcOrigin);
 	char* PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier);
