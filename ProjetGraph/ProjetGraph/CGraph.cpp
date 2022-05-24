@@ -261,7 +261,21 @@ void CGraph::GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int u
         throw CException(EXCEPTION_NODE_NOT_FOUND);
     }
 
+    CLink* pLINToModify = nullptr;
+    //We take the link to modify
+    try {
+        pLINToModify = pNODSource->NODGetLinkTowardNode(uiVNodeOldDestination);
+    }
+    catch (CException EXCError) {
+        throw EXCError;
+    }
 
+    //We remove this link from the input link list of the old destination
+    pNODDestination->NODRemoveInputLink(*pLINToModify);
+
+    //And add it to the new destination
+    pLINToModify->LINSetEnd(uiVNodeNewDestination);
+    pNODNewDestination->NODAddInputLink(*pLINToModify);
 
 }
 

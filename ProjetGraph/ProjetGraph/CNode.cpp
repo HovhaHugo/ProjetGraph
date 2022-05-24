@@ -97,7 +97,7 @@ void CNode::NODShow() {
 
 
 /**
- * Lets you know if the node contains a link to another node in particular
+ * Lets you know if the node contains a link to another node
  * Input: uiDestination : unsigned int
  * Output: CLink*
  * Precondition : /
@@ -292,11 +292,17 @@ unsigned int CNode::NODGetValue() {
  * Setter of uiNODValue
  * Input: uiValue: unsigned int
  * Output: /
- * Precondition : /
- * Postcondition : uiNODValue = uiValue
+ * Precondition : All the links concerning this node must be modified before,
+	otherwise modifying the value may make the graph unstable and cause bugs
+ * Postcondition : uiNODValue = uiValue and all input links have been updated
  */
 void CNode::NODSetValue(unsigned int uiValue) {
 	uiNODValue = uiValue;
+
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+		ppLINNODInputLink[uiLoop]->LINSetEnd(uiValue);
+	}
+
 }
 
 
@@ -311,6 +317,7 @@ CLink** CNode::NODGetInputLink(unsigned int* uiSize) {
 	*uiSize = uiNODInputSize;
 	return ppLINNODInputLink;
 }
+
 
 /**
  * Getter of ppLINNODOutputLink
