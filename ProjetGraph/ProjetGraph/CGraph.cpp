@@ -99,23 +99,22 @@ CGraph::CGraph(CGraph* pGRAToCopy) {
  */
 CGraph* CGraph::GRAInverse() {
     //We create a new object
-    CGraph* newGraph = new CGraph();
+    CGraph* pGRANewGraph = new CGraph();
 
-    newGraph->bGRAIsOriented = GRAGetIsOriented();
+    pGRANewGraph->bGRAIsOriented = GRAGetIsOriented();
     unsigned int uiSize = 0;
     GRAGetNode(uiSize);
 
     //For each node, we recopy them all in the new graph
     for (unsigned int uiLoopNode; uiLoopNode < uiSize; uiLoopNode++) {
-        CNode newNode = new CNode(GRAGetNode(uiLoopNode)->NODGetValue());
-        newGraph->GRAAddNode(newNode);
+        pGRANewGraph->GRAAddNode(GRAGetNode(uiLoopNode)->NODGetValue());
 
         //For each input on the node, we add the link reversed une our graph
         unsigned int uiSizeLinkInput = 0;
         CLink** ppLINInputLink = GRAGetNode(uiLoopNode)->NODGetInputLink(&uiSizeLinkInput);
         for (unsigned int uiLoopLinkInput; uiLoopLinkInput < uiSizeLinkInput; uiLoopLinkInput++) {
             unsigned int uiEnd = ppLINInputLink[uiLoopLinkInput]->LINGetEnd();
-            newGraph->GRAAddLinkBetweenNode(uiLoopNode, uiEnd);
+            pGRANewGraph->GRAAddLinkBetweenNode(uiLoopNode, uiEnd);
         }
 
         //For each output on the node, we add the link reversed une our graph
@@ -124,10 +123,10 @@ CGraph* CGraph::GRAInverse() {
         CLink** ppLINOutputLink = GRAGetNode(uiLoopNode)->NODGetInputLink(&uiSizeLinkInput);
         for (unsigned int uiLoopLinkOutput; uiLoopLinkOutput < uiSizeLinkOutput; uiLoopLinkOutput++) {
             unsigned int uiEnd = ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd();
-            newGraph->GRAAddLinkBetweenNode(uiEnd, uiLoopNode);
+            pGRANewGraph->GRAAddLinkBetweenNode(uiEnd, uiLoopNode);
         }
     }
-    return newGraph;
+    return pGRANewGraph;
 }
 
 
@@ -157,11 +156,11 @@ void CGraph::GRAShow() {
 void CGraph::GRAAddLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int uiValueNodeDestination) {
 
     //Check if the 2 nodes exist in the graph
-    CNode* pcSource = nullptr;
-    CNode* pcDestination = nullptr;
+    CNode* pNODSource = nullptr;
+    CNode* pNODDestination = nullptr;
     try {
-        pcSource = GRAGetNode(uiValueNodeSource);
-        pcDestination = GRAGetNode(uiValueNodeDestination);
+        pNODSource = GRAGetNode(uiValueNodeSource);
+        pNODDestination = GRAGetNode(uiValueNodeDestination);
     }
     catch (CException EXCError) {
         throw EXCError;
@@ -170,19 +169,19 @@ void CGraph::GRAAddLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int 
     //Creation of the new link
     CLink* LINNew = new CLink();
 
-    LINNew->LINSetEnd(pcDestination->NODGetValue());
+    LINNew->LINSetEnd(pNODDestination->NODGetValue());
 
-    pcSource->NODAddOutputLink(*LINNew);
-    pcDestination->NODAddInputLink(*LINNew);
+    pNODSource->NODAddOutputLink(*LINNew);
+    pNODDestination->NODAddInputLink(*LINNew);
 
     //If the graph is oriented, create a new link in the other direction
     if (bGRAIsOriented) {
         CLink* LINNewBack = new CLink();
 
-        LINNewBack->LINSetEnd(pcSource->NODGetValue());
+        LINNewBack->LINSetEnd(pNODSource->NODGetValue());
 
-        pcDestination->NODAddOutputLink(*LINNew);
-        pcSource->NODAddInputLink(*LINNew);
+        pNODDestination->NODAddOutputLink(*LINNew);
+        pNODSource->NODAddInputLink(*LINNew);
     }
 
 }
@@ -200,11 +199,11 @@ void CGraph::GRAAddLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int 
 void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int uiValueNodeDestination) {
 
     //Check if the 2 nodes exist in the graph
-    CNode* pcSource = nullptr;
-    CNode* pcDestination = nullptr;
+    CNode* pNODSource = nullptr;
+    CNode* pNODDestination = nullptr;
     try {
-        pcSource = GRAGetNode(uiValueNodeSource);
-        pcDestination = GRAGetNode(uiValueNodeDestination);
+        pNODSource = GRAGetNode(uiValueNodeSource);
+        pNODDestination = GRAGetNode(uiValueNodeDestination);
     }
     catch (CException EXCError) {
         throw CException(EXCEPTION_NODE_NOT_FOUND);
@@ -215,9 +214,9 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
     //We try to get the link and delete the pointer is the 2 involved nodes
     //Then we delete the link
     try {
-        pLINLinkToRemove = pcSource->NODGetLinkTowardNode(uiValueNodeDestination);
-        pcSource->NODRemoveOutputLink(*pLINLinkToRemove);
-        pcDestination->NODRemoveInputLink(*pLINLinkToRemove);
+        pLINLinkToRemove = pNODSource->NODGetLinkTowardNode(uiValueNodeDestination);
+        pNODSource->NODRemoveOutputLink(*pLINLinkToRemove);
+        pNODDestination->NODRemoveInputLink(*pLINLinkToRemove);
         delete pLINLinkToRemove;
     }
     catch (CException EXCError) {
@@ -232,9 +231,9 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
         //We try to get the link and delete the pointeur is the 2 concerned nodes
         //Then we delete the link
         try {
-            pLINLinkToRemoveBack = pcDestination->NODGetLinkTowardNode(uiValueNodeSource);
-            pcDestination->NODRemoveOutputLink(*pLINLinkToRemoveBack);
-            pcSource->NODRemoveInputLink(*pLINLinkToRemoveBack);
+            pLINLinkToRemoveBack = pNODDestination->NODGetLinkTowardNode(uiValueNodeSource);
+            pNODDestination->NODRemoveOutputLink(*pLINLinkToRemoveBack);
+            pNODSource->NODRemoveInputLink(*pLINLinkToRemoveBack);
             delete pLINLinkToRemoveBack;
         }
         catch (CException EXCError) {
@@ -249,6 +248,20 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
 
 void CGraph::GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int uiVNodeOldDestination, unsigned int uiVNodeNewDestination) {
 
+    //Check if the 3 nodes exist in the graph
+    CNode* pNODSource = nullptr;
+    CNode* pNODDestination = nullptr;
+    CNode* pNODNewDestination = nullptr;
+    try {
+        pNODSource = GRAGetNode(uiVNodeSource);
+        pNODDestination = GRAGetNode(uiVNodeOldDestination);
+        pNODNewDestination = GRAGetNode(uiVNodeNewDestination);
+    }
+    catch (CException EXCError) {
+        throw CException(EXCEPTION_NODE_NOT_FOUND);
+    }
+
+
 
 }
 
@@ -256,21 +269,44 @@ void CGraph::GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int u
 
 /**
  * Add a node to the graph
- * Input: NODParam : CNode&
+ * Input: uiNodeValue : unsigned int
  * Output: /
  * Precondition : /
- * Postcondition : If the node are already in the graph an error is throw, else
-    the NODParam is added to the graph and uiGRASize is incremented
+ * Postcondition : If the value is already in the graph an error is throw, else
+    a Node is created, added to the graph and uiGRASize is incremented
  */
-void CGraph::GRAAddNode(CNode& NODParam) {
+CNode* CGraph::GRAAddNode(unsigned int uiNodeValue) {
 
-    uiGRASize++;
-    CNode* pNODTemp = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
-    if (pNODTemp == nullptr) {
-        throw CException();
+    //We check if this value already exists in the graph
+    bool bExist = true;
+    try {
+        CNode* pNODExist = GRAGetNode(uiNodeValue);
     }
-    pNODGRANodeList = pNODTemp;
-    pNODGRANodeList[uiGRASize - 1] = NODParam;
+    catch (CException EXCError) {
+        bExist = false;
+    }
+
+    //If not, we can create a new node and add it
+    if (bExist == false) {
+    
+        CNode* pNODToAdd = new CNode(uiNodeValue);
+        uiGRASize++;
+
+        CNode* pNODTemp = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
+        if (pNODTemp == nullptr) {
+            throw CException();
+        }
+        pNODGRANodeList = pNODTemp;
+
+        pNODGRANodeList[uiGRASize - 1] = pNODToAdd;
+
+        return pNODToAdd;
+    
+    }
+    else {
+        throw CException(EXCEPTION_NODE_NOT_FOUND);
+    }
+    
 
 }
 
