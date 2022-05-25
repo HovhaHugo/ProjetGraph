@@ -12,7 +12,7 @@ using namespace std;
  *	/!\ since the destination is set to 0 by default, the object is not usable/coherent
  */
 CLink::CLink() {
-	uiNODEnd = 0;
+	uiLINEnd = 0;
 }
 
 
@@ -24,7 +24,7 @@ CLink::CLink() {
  * Postcondition : the object has been created in memory with uiNODEnd = uiDestination
  */
 CLink::CLink(unsigned int uiDestination) {
-	uiNODEnd = uiDestination;
+	uiLINEnd = uiDestination;
 }
 
 
@@ -36,7 +36,7 @@ CLink::CLink(unsigned int uiDestination) {
  * Postcondition : uiNODEnd = pLINToCopy->uiNODEnd
  */
 CLink::CLink(CLink* pLINToCopy) {
-	uiNODEnd = pLINToCopy->uiNODEnd;
+	uiLINEnd = pLINToCopy->uiLINEnd;
 }
 
 
@@ -60,7 +60,7 @@ CLink::~CLink() {
  * Postcondition : The link is shown in the console
  */
 void CLink::LINShow() {
-	cout << "Lien vers : " << uiNODEnd << endl;
+	cout << "Link to Node #" << uiLINEnd << endl;
 
 }
 
@@ -73,7 +73,7 @@ void CLink::LINShow() {
  * Postcondition : uiNODEnd is returned
  */
 unsigned int CLink::LINGetEnd() {
-	return uiNODEnd;
+	return uiLINEnd;
 }
 
 /**
@@ -84,5 +84,5 @@ unsigned int CLink::LINGetEnd() {
  * Postcondition : uiNODEnd = uiParam;
  */
 void CLink::LINSetEnd(unsigned int uiParam) {
-	uiNODEnd = uiParam;
+	uiLINEnd = uiParam;
 }

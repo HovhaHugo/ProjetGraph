@@ -2,7 +2,7 @@
 class CLink
 {
 private:
-	unsigned int uiNODEnd;
+	unsigned int uiLINEnd;
 
 public:
 	CLink();

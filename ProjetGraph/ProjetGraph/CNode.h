@@ -4,6 +4,8 @@
 
 #define EXCEPTION_LINK_NOT_EXIST 2
 #define EXCEPTION_TRY_DELETE_USED_NODE 3
+#define EXCEPTION_MallocError 6			//Memory allocation error
+
 
 class CNode
 {

@@ -78,20 +78,16 @@ CNode::~CNode() {
  * Input: /
  * Output: /
  * Precondition : /
- * Postcondition : The node is shown in the console
+ * Postcondition : The node value and only output links are displayed
  */
 void CNode::NODShow() {
-	cout << "Noeud de valeur : " << uiNODValue << endl;
+	cout << "Node value : " << uiNODValue << endl;
 
-	cout << "Lien(s) d'entrée :" << endl;
-	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
-		ppLINNODInputLink[uiLoop]->LINShow();
-	}
-
-	cout << "Lien(s) de sortie :" << endl;
+	cout << "Output links :" << endl;
 	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
 		ppLINNODOutputLink[uiLoop]->LINShow();
 	}
+	cout << endl;
 
 }
 
@@ -178,12 +174,12 @@ void CNode::NODAddOutputLink(CLink& pLINParam) {
 
 	CLink** ppLINTemp = nullptr;
 
-	uiNODInputSize++;
-	ppLINTemp = (CLink**)realloc(ppLINNODOutputLink, uiNODInputSize * sizeof(CLink*));
+	uiNODOutputSize++;
+	ppLINTemp = (CLink**)realloc(ppLINNODOutputLink, uiNODOutputSize * sizeof(CLink*));
 
 	if (ppLINTemp != nullptr) {
 		ppLINNODOutputLink = ppLINTemp;
-		ppLINNODOutputLink[uiNODInputSize - 1] = &pLINParam;	//JE SUIS PAS DU TOUT SUR
+		ppLINNODOutputLink[uiNODOutputSize - 1] = &pLINParam;	//JE SUIS PAS DU TOUT SUR
 	}
 	else
 		throw CException();
@@ -211,7 +207,7 @@ void CNode::NODRemoveInputLink(CLink& pLINParam) {
 		}
 	}
 	if (bFound == false) {
-		//lancer une erreur, ou avoir une valeur de retour en bool
+		throw CException(EXCEPTION_LINK_NOT_EXIST);
 	}
 
 	for (unsigned int uiLoop = indexFound; uiLoop < uiNODInputSize - 1; uiLoop++) {
@@ -223,11 +219,11 @@ void CNode::NODRemoveInputLink(CLink& pLINParam) {
 	uiNODInputSize--;
 	ppLINTemp = (CLink**)realloc(ppLINNODInputLink, uiNODInputSize * sizeof(CLink*));
 
-	if (ppLINTemp != nullptr) {
+	if (ppLINTemp != nullptr || uiNODInputSize == 0) {
 		ppLINNODInputLink = ppLINTemp;
 	}
 	else
-		throw CException();
+		throw CException(EXCEPTION_MallocError);
 
 }
 
@@ -252,7 +248,7 @@ void CNode::NODRemoveOutputLink(CLink& pLINParam) {
 		}
 	}
 	if (bFound == false) {
-		//lancer une erreur, ou avoir une valeur de retour en bool
+		throw CException(EXCEPTION_LINK_NOT_EXIST);
 	}
 
 	for (unsigned unsigned int uiLoop = indexFound; uiLoop < uiNODOutputSize - 1; uiLoop++) {
@@ -264,7 +260,7 @@ void CNode::NODRemoveOutputLink(CLink& pLINParam) {
 	uiNODOutputSize--;
 	ppLINTemp = (CLink**)realloc(ppLINNODOutputLink, uiNODOutputSize * sizeof(CLink*));
 
-	if (ppLINTemp != nullptr) {
+	if (ppLINTemp != nullptr || uiNODOutputSize == 0) {
 		ppLINNODOutputLink = ppLINTemp;
 	}
 	else
@@ -293,10 +289,15 @@ unsigned int CNode::NODGetValue() {
  * Input: uiValue: unsigned int
  * Output: /
  * Precondition : /
- * Postcondition : uiNODValue = uiValue
+ * Postcondition : uiNODValue = uiValue and all input links have been updated
+ *
  */
 void CNode::NODSetValue(unsigned int uiValue) {
 	uiNODValue = uiValue;
+
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+		ppLINNODInputLink[uiLoop]->LINSetEnd(uiValue);
+	}
 }
 
 

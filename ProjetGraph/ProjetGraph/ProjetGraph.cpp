@@ -5,22 +5,45 @@
 #include "CGraph.h"
 #include "CException.h"
 
+using namespace std;
+
 int main()
 {
     try {
-        std::cout << "Hello World!\n";
         CGraph* test = new CGraph();
         CNode node1 = new CNode(1);
         //CNode node2 = new CNode(2);
         test->GRAAddNode(1);
         test->GRAAddNode(2);
+        test->GRAAddNode(3);
         test->GRAAddLinkBetweenNode(1, 2);
+
+        cout << "Premier affichage " << endl;
         test->GRAShow();
+
         test->GRAAddLinkBetweenNode(2, 1);
+        cout << "\nDeuxieme affichage " << endl;
         test->GRAShow();
+
+        test->GRARemoveLinkBetweenNode(1, 2);
+        cout << "\nTroisieme affichage, apres suppression du lien 1 vers 2 " << endl;
+        test->GRAShow();
+
+        test->GRAAddLinkBetweenNode(1, 2);
+        cout << "\nQuatrieme affichage, on remet un lien 1 vers 2 " << endl;
+        test->GRAShow();
+
+        test->GRAChangeLinkDestination(1, 2, 3);
+        cout << "\nCinquieme affichage, on change la destination de 1 vers 2 a 1 vers 3 " << endl;
+        test->GRAShow();
+
+        test->GRARemoveNode(3);
+        cout << "\nSixieme affichage, on supprime le noeud 3 " << endl;
+        test->GRAShow();
+
     }
     catch (CException EXCError) {
-        
+        cout << "Error " << EXCError.EXCgetValue() << endl;
     }
     
 }
