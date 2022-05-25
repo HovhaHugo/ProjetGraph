@@ -40,8 +40,17 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
     char cLigne[LINE_LENGTH];
     bool bContinueRead = true;
 
+    //Put the word to upper to avoid case error
+    char* pcIdentifierUpper = (char*)malloc(sizeof(char) * LINE_LENGTH);
+    if (pcIdentifierUpper == nullptr) {
+        throw CException(EXCEPTION_MallocError);
+    }
+
+    PARToUpper(pcIdentifierUpper, pcIdentifier);
+
     char* pcDataToReturn = (char*)malloc(sizeof(char)*LINE_LENGTH);
     if (pcDataToReturn == nullptr) {
+        free(pcIdentifierUpper);
         throw CException(EXCEPTION_MallocError);
     }
 
@@ -62,28 +71,32 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
         char* pcLineIdentifier = strtok(cLigne, &cPARSeparator);
 
         //Put the word to upper to avoid case error
-        char* tcUpperText = (char*)malloc(sizeof(char) * LINE_LENGTH);
-        if (tcUpperText == nullptr) {
+        char* pcLabelUpper = (char*)malloc(sizeof(char) * LINE_LENGTH);
+        if (pcLabelUpper == nullptr) {
+            free(pcIdentifierUpper);
             throw CException(EXCEPTION_MallocError);
         }
-        PARToUpper(tcUpperText, pcLineIdentifier);
+        PARToUpper(pcLabelUpper, pcLineIdentifier);
 
         //Check if the label is the one we are looking for
-        if (strstr(tcUpperText, pcIdentifier)) {
+        if (strncmp(pcLineIdentifier, pcLabelUpper, strlen(pcLineIdentifier)) == 0) {
 
             //pcLineIdentifier contains now the data to get
             pcLineIdentifier = strtok(nullptr, " ");
             if (pcLineIdentifier == nullptr) {
-                free(tcUpperText);
+                free(pcLabelUpper);
+                free(pcIdentifierUpper);
                 throw CException(EXCEPTION_ErrorDataFile);
             }
 
-            free(tcUpperText);
             bContinueRead = false;
-            continue;
         }
 
+        free(pcLabelUpper);
+
     }//while(bContinueRead)
+
+    free(pcIdentifierUpper);
 
     return pcDataToReturn;
 
@@ -101,14 +114,6 @@ unsigned int CParser::PARGetNumber(const char* pcIdentifier) {
 
     ifstream ifFile(pcPARFilePath);
 
-    //Put the word to upper to avoid case error
-    char* pcIdentifierUpper = (char*)malloc(sizeof(char) * LINE_LENGTH);
-    if (pcIdentifierUpper == nullptr) {
-        throw CException(EXCEPTION_MallocError);
-    }
-
-    PARToUpper(pcIdentifierUpper, pcIdentifier);
-
     //file forward
     char* pcData = PARJumpToIdentifier(&ifFile, pcIdentifier);
 
@@ -119,17 +124,13 @@ unsigned int CParser::PARGetNumber(const char* pcIdentifier) {
     iNbFound = strtod(pcData, &pcEndPtr);
 
     if (pcEndPtr == pcData) {
-        free(&pcIdentifier);
         throw CException(EXCEPTION_ConversionError);
     }
 
     //Check validity of number
     if (iNbFound < 0) {
-        free(&pcIdentifier);
         throw CException(EXCEPTION_invalide_number);
     }
-
-    free(&pcIdentifier);
 
     return iNbFound;
 
@@ -143,7 +144,7 @@ unsigned int CParser::PARGetNumber(const char* pcIdentifier) {
 * Precondition: uiNodeListSize is the number read with PARGetNumber(const char* pcIdentifier)
 * Postcondition: If the number of CNode read is the same as uiNodeListSize, the list of CNode is returned
 ***/
-CNode* CParser::PARGetNodes(unsigned int uiNodeListSize) {
+CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier) {
 
     CNode* pNODNodeList = (CNode*)malloc(uiNodeListSize * sizeof(CNode));
     if (pNODNodeList == nullptr) {
@@ -152,7 +153,7 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize) {
 
     ifstream ifFile(pcPARFilePath);
 
-    PARJumpToIdentifier(&ifFile, "SOMMETS");
+    PARJumpToIdentifier(&ifFile, pcIdentifier);
 
     char cLigne[LINE_LENGTH];
     bool bContinueRead = true;
@@ -182,21 +183,30 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize) {
         int iNodeNumber = strtod(pcNodeNumber, &pcEndPtr);
 
         if (pcEndPtr == pcNodeNumber) {
+            free(pNODNodeList);
             throw CException(EXCEPTION_ConversionError);
         }
 
         if (iNodeNumber < 0) {
+            free(pNODNodeList);
             throw CException(EXCEPTION_invalide_number);
         }
 
         uiNbOfNodeFound++;
 
-        if (uiNbOfNodeFound < uiNodeListSize)
-            throw CException();
+        if (uiNbOfNodeFound > uiNodeListSize) {
+            free(pNODNodeList);
+            throw CException(EXCEPTION_invalide_number);
+        }
 
-        pNODNodeList[uiNbOfNodeFound - 1] = new CNode(iNodeNumber);
+        *(pNODNodeList+uiNbOfNodeFound-1) = new CNode(iNodeNumber);
         
     }//while(bContinueRead)
+
+    if (uiNbOfNodeFound > uiNodeListSize) {
+        free(pNODNodeList);
+        throw CException(EXCEPTION_invalide_number);
+    }
 
     return pNODNodeList;
 
@@ -206,16 +216,16 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize) {
 
 /***
 * Get the list of links
-* Input: piFrom : int*, piTo : int*, iSize : int
+* Input: piFrom : int*, piTo : int*, iSize : unsigned int, pcIdentifier : const char*
 * Output: piFrom : int*, piTo : int*
 * Precondition: piFrom and piTo are allocated in memory with a space of iSize int
-* Postcondition: piFrom contains the list of the begins of the links, piTo contains the list of ends
+* Postcondition: piFrom contains the list of the begins of the links, piTo contains the list of ends.
 ***/
-void CParser::PARGetLink(int* piFrom, int* piTo, int iSize) {
+void CParser::PARGetLink(int* piFrom, int* piTo, unsigned int iSize, const char* pcIdentifier) {
 
     ifstream ifFile(pcPARFilePath);
 
-    PARJumpToIdentifier(&ifFile, "LIENS");
+    PARJumpToIdentifier(&ifFile, pcIdentifier);
 
     char cLigne[LINE_LENGTH];
     bool bContinueRead = true;

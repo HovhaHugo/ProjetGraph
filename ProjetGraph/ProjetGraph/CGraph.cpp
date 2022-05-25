@@ -41,7 +41,7 @@ CGraph::CGraph(char* pcFilePath) {
     unsigned int uiNbOfNode = pPARParser->PARGetNumber("NBSommets");
     unsigned int uiNbOfLink = pPARParser->PARGetNumber("NBArcs");
 
-    CNode* pNODNodeList = pPARParser->PARGetNodes(uiNbOfNode);
+    CNode* pNODNodeList = pPARParser->PARGetNodes(uiNbOfNode,"Sommets");
 
     //temporary lists of link data are created in memory 
     int* piListLinkFrom = (int*)malloc(sizeof(int) * uiNbOfLink);
@@ -54,8 +54,8 @@ CGraph::CGraph(char* pcFilePath) {
         throw CException();
     }
 
-    //Fille the previous lists
-    pPARParser->PARGetLink(piListLinkFrom, piListLinkTo, uiNbOfLink);
+    //Fill the previous lists
+    pPARParser->PARGetLink(piListLinkFrom, piListLinkTo, uiNbOfLink, "Arcs");
 
     //Add link between the nodes
     try {
@@ -197,7 +197,7 @@ void CGraph::GRAAddLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int 
     pNODDestination->NODAddInputLink(*LINNew);
 
     //If the graph is oriented, create a new link in the other direction
-    if (bGRAIsOriented) {
+    if (bGRAIsOriented==false) {
         CLink* LINNewBack = new CLink();
 
         LINNewBack->LINSetEnd(pNODSource->NODGetValue());
@@ -245,8 +245,8 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
         throw EXCError;
     }
 
-    //If the graph is oriented, we remove in the other direction
-    if (bGRAIsOriented) {
+    //If the graph is not oriented, we remove in the other direction
+    if (bGRAIsOriented==false) {
 
         CLink* pLINLinkToRemoveBack = nullptr;
 
@@ -355,10 +355,10 @@ void CGraph::GRARemoveNode(unsigned int uiValue) {
     }
 
     /*
-    if the graph is oriented, the fastest method is to browse the entire graph and
+    if the graph is not oriented, the fastest method is to browse the entire graph and
     use the GRARemoveLinkBetweenNode method which allows you to remove all the links in 2 nodes
     */
-    if (bGRAIsOriented) {
+    if (bGRAIsOriented == false) {
 
         for (unsigned int uiLoop = 0; uiLoop < uiGRASize; uiLoop++) {
 
