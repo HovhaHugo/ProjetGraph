@@ -13,7 +13,10 @@
  */
 CGraph::CGraph() {
     uiGRASize = 0;
-    pNODGRANodeList = (CNode**)malloc(sizeof(CNode*) * uiGRASize);
+    pNODGRANodeList = (CNode*)calloc(uiGRASize, sizeof(CNode));
+    if (pNODGRANodeList == nullptr) {
+        throw CException(EXCEPTION_MallocError);
+    }
     bGRAIsOriented = true;
 }
 
@@ -76,22 +79,14 @@ CGraph::CGraph(const char* pcFilePath) {
  * Input: /
  * Output: /
  * Precondition : /
- * Postcondition : the object has been deleted from memory
+ * Postcondition : the object and all his nodes has been deleted from memory
  */
 CGraph::~CGraph() {
-    //Destruction des neouds à l'intérieur
+
     for (unsigned int uiLoopNode = 0; uiLoopNode < uiGRASize; uiLoopNode++) {
-        unsigned int uiSizeNode = 0;
-        CLink** ppLINLinkList = pNODGRANodeList[uiLoopNode]->NODGetInputLink(&uiSizeNode);
-
-        for (unsigned int uiLoopLink = 0; uiLoopLink < uiSizeNode; uiLoopLink++) {
-            pNODGRANodeList[uiLoopNode]->NODRemoveInputLink(*ppLINLinkList[uiLoopLink]);
-        }
-
-        delete (pNODGRANodeList+uiLoopNode);
+        GRARemoveNode(pNODGRANodeList[uiLoopNode].NODGetValue());
     }
     delete pNODGRANodeList;
-
 
     bGRAIsOriented = false;
     uiGRASize = 0;
@@ -106,46 +101,64 @@ CGraph::~CGraph() {
  * Postcondition : the object has been created in memory with this = pGRAToCopy
  */
 CGraph::CGraph(CGraph* pGRAToCopy) {
+
     uiGRASize = pGRAToCopy->uiGRASize;
-    pNODGRANodeList = pGRAToCopy->pNODGRANodeList;
     bGRAIsOriented = pGRAToCopy->bGRAIsOriented;
+
+    pNODGRANodeList = (CNode*)calloc(uiGRASize, sizeof(CNode));
+    if (pNODGRANodeList == nullptr) {
+        throw CException(EXCEPTION_MallocError);
+    }
+
+    for (unsigned int uiLoop = 0; uiLoop < pGRAToCopy->uiGRASize; uiLoop++) {
+
+        pNODGRANodeList[uiLoop] = CNode(pGRAToCopy->pNODGRANodeList[uiLoop]);
+
+    }
+    
+
 }
 
 
 /**
- * Function that inverte a graph (mean that each arc change their start for their beginging)
+ * Function that inverte a graph (mean that each link change their start for their beginging)
  * Input: /
  * Output: /
  * Precondition : /
- * Postcondition : the grpah has been inverted
+ * Postcondition : the graph has been inverted
  */
 CGraph* CGraph::GRAInverse() {
     //We create a new object
     CGraph* pGRANewGraph = new CGraph();
 
     pGRANewGraph->bGRAIsOriented = GRAGetIsOriented();
-    unsigned int uiSize = 0;
-    GRAGetNode(uiSize);
 
     //For each node, we recopy them all in the new graph
-    for (unsigned int uiLoopNode = 0; uiLoopNode < uiSize; uiLoopNode++) {
-        pGRANewGraph->GRAAddNode(GRAGetNode(uiLoopNode)->NODGetValue());
+    for (unsigned int uiLoopNode = 0; uiLoopNode < uiGRASize; uiLoopNode++) {
+        pGRANewGraph->GRAAddNode(pNODGRANodeList[uiLoopNode].NODGetValue());
+    }
+
+    //Then we can create the links between the nodes
+    for(unsigned int uiLoopNode = 0; uiLoopNode < uiGRASize; uiLoopNode++){
+
+        CNode* pNODCurrent = (pNODGRANodeList+uiLoopNode);
 
         //For each input on the node, we add the link reversed une our graph
         unsigned int uiSizeLinkInput = 0;
-        CLink** ppLINInputLink = GRAGetNode(uiLoopNode)->NODGetInputLink(&uiSizeLinkInput);
+        CLink** ppLINInputLink = pNODCurrent->NODGetInputLink(&uiSizeLinkInput);
+
         for (unsigned int uiLoopLinkInput = 0; uiLoopLinkInput < uiSizeLinkInput; uiLoopLinkInput++) {
             unsigned int uiEnd = ppLINInputLink[uiLoopLinkInput]->LINGetEnd();
-            pGRANewGraph->GRAAddLinkBetweenNode(uiLoopNode, uiEnd);
+            pGRANewGraph->GRAAddLinkBetweenNode(pNODCurrent->NODGetValue(), uiEnd);
         }
 
         //For each output on the node, we add the link reversed une our graph
         unsigned int uiSizeLinkOutput = 0;
-        GRAGetNode(uiLoopNode)->NODGetOutputLink(&uiSizeLinkOutput);
-        CLink** ppLINOutputLink = GRAGetNode(uiLoopNode)->NODGetInputLink(&uiSizeLinkInput);
+        CLink** ppLINOutputLink = pNODCurrent->NODGetInputLink(&uiSizeLinkInput);
+
         for (unsigned int uiLoopLinkOutput = 0; uiLoopLinkOutput < uiSizeLinkOutput; uiLoopLinkOutput++) {
             unsigned int uiEnd = ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd();
-            pGRANewGraph->GRAAddLinkBetweenNode(uiEnd, uiLoopNode);
+            pGRANewGraph->GRAAddLinkBetweenNode(uiEnd, pNODCurrent->NODGetValue());
         }
     }
     return pGRANewGraph;
@@ -162,7 +175,7 @@ CGraph* CGraph::GRAInverse() {
 void CGraph::GRAShow() {
 
     for (unsigned int uiLoop = 0; uiLoop < uiGRASize; uiLoop++) {
-        pNODGRANodeList[uiLoop]->NODShow();
+        pNODGRANodeList[uiLoop].NODShow();
     }
 }
 
@@ -189,21 +202,13 @@ void CGraph::GRAAddLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int 
     }
 
     //Creation of the new link
-    CLink* LINNew = new CLink();
-
-    LINNew->LINSetEnd(pNODDestination->NODGetValue());
-
-    pNODSource->NODAddOutputLink(*LINNew);
-    pNODDestination->NODAddInputLink(*LINNew);
+    pNODSource->NODAddOutputLink(pNODDestination->NODGetValue());
+    pNODDestination->NODAddInputLink(pNODSource->NODGetValue());
 
     //If the graph is oriented, create a new link in the other direction
     if (bGRAIsOriented==false) {
-        CLink* LINNewBack = new CLink();
-
-        LINNewBack->LINSetEnd(pNODSource->NODGetValue());
-
-        pNODDestination->NODAddOutputLink(*LINNew);
-        pNODSource->NODAddInputLink(*LINNew);
+        pNODSource->NODAddInputLink(pNODDestination->NODGetValue());
+        pNODDestination->NODAddOutputLink(pNODSource->NODGetValue());
     }
 
 }
@@ -231,15 +236,10 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
         throw CException(EXCEPTION_NODE_NOT_FOUND);
     }
 
-    CLink* pLINLinkToRemove = nullptr;
-
-    //We try to get the link and delete the pointer is the 2 involved nodes
-    //Then we delete the link
+    //The delete the 2 links
     try {
-        pLINLinkToRemove = pNODSource->NODGetLinkTowardNode(uiValueNodeDestination);
-        pNODSource->NODRemoveOutputLink(*pLINLinkToRemove);
-        pNODDestination->NODRemoveInputLink(*pLINLinkToRemove);
-        delete pLINLinkToRemove;
+        pNODSource->NODRemoveOutputLink(pNODDestination->NODGetValue());
+        pNODDestination->NODRemoveInputLink(pNODSource->NODGetValue());
     }
     catch (CException EXCError) {
         throw EXCError;
@@ -248,15 +248,10 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
     //If the graph is not oriented, we remove in the other direction
     if (bGRAIsOriented==false) {
 
-        CLink* pLINLinkToRemoveBack = nullptr;
-
-        //We try to get the link and delete the pointer is the 2 concerned nodes
-        //Then we delete the link
+        //The delete the 2 links
         try {
-            pLINLinkToRemoveBack = pNODDestination->NODGetLinkTowardNode(uiValueNodeSource);
-            pNODDestination->NODRemoveOutputLink(*pLINLinkToRemoveBack);
-            pNODSource->NODRemoveInputLink(*pLINLinkToRemoveBack);
-            delete pLINLinkToRemoveBack;
+            pNODDestination->NODRemoveOutputLink(pNODSource->NODGetValue());
+            pNODSource->NODRemoveInputLink(pNODDestination->NODGetValue());
         }
         catch (CException EXCError) {
             throw EXCError;
@@ -274,7 +269,7 @@ void CGraph::GRARemoveLinkBetweenNode(unsigned int uiValueNodeSource, unsigned i
  * Precondition : /
  * Postcondition : If at least 1 of the 3 nodes is not in the graph an error is throw, same if
  *  there is not an existing link between the 2 old nodes.
- *  Else, the link between uiValueNodeSource and uiVNodeOldDestination are now uiValueNodeSource to uiVNodeNewDestination
+ *  Else, the existing link between uiValueNodeSource and uiVNodeOldDestination are now uiValueNodeSource to uiVNodeNewDestination
  */
 void CGraph::GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int uiVNodeOldDestination, unsigned int uiVNodeNewDestination) {
 
@@ -290,22 +285,18 @@ void CGraph::GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int u
     catch (CException EXCError) {
         throw CException(EXCEPTION_NODE_NOT_FOUND);
     }
-
-    CLink* pLINToModify = nullptr;
-    //We take the link to modify
+   
     try {
-        pLINToModify = pNODSource->NODGetLinkTowardNode(uiVNodeOldDestination);
+        //We remove this link from the input link list of the old destination
+        pNODDestination->NODRemoveInputLink(pNODSource->NODGetValue());
+
+        //And add it to the new destination
+        pNODSource->NODGetLinkTowardNode(uiVNodeOldDestination)->LINSetEnd(pNODNewDestination->NODGetValue());
+        pNODNewDestination->NODAddInputLink(pNODSource->NODGetValue());
     }
     catch (CException EXCError) {
         throw EXCError;
     }
-
-    //We remove this link from the input link list of the old destination
-    pNODDestination->NODRemoveInputLink(*pLINToModify);
-
-    //And add it to the new destination
-    pLINToModify->LINSetEnd(uiVNodeNewDestination);
-    pNODNewDestination->NODAddInputLink(*pLINToModify);
 
 }
 
@@ -333,18 +324,17 @@ CNode* CGraph::GRAAddNode(unsigned int uiNodeValue) {
     //If not, we can create a new node and add it
     if (bExist == false) {
     
-        CNode* pNODToAdd = new CNode(uiNodeValue);
         uiGRASize++;
 
-        CNode** pNODTemp = (CNode**)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode*));
+        CNode* pNODTemp = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
         if (pNODTemp == nullptr) {
             throw CException();
         }
         pNODGRANodeList = pNODTemp;
 
-        pNODGRANodeList[uiGRASize - 1] = pNODToAdd;
+        pNODGRANodeList[uiGRASize - 1] = CNode(uiNodeValue);;
 
-        return pNODToAdd;
+        return (pNODGRANodeList+uiGRASize - 1);
     
     }
     else {
@@ -367,91 +357,56 @@ void CGraph::GRARemoveNode(unsigned int uiValue) {
 
     //Check if the node exists in the graph
     CNode* pNODToRemove = nullptr;
+    unsigned int uiIndexNode = 0;
     for (unsigned int uiLoop = 0; uiLoop < uiGRASize; uiLoop++) {
-        if (pNODGRANodeList[uiLoop]->NODGetValue() == uiValue) {
-            pNODToRemove = pNODGRANodeList[uiLoop];
+        if (pNODGRANodeList[uiLoop].NODGetValue() == uiValue) {
+            pNODToRemove = (pNODGRANodeList+uiLoop);
+            uiIndexNode = uiLoop;
         }
     }
     if (pNODToRemove == nullptr) {
         throw CException(EXCEPTION_NODE_NOT_FOUND);
     }
 
-    /*
-    if the graph is not oriented, the fastest method is to browse the entire graph and
-    use the GRARemoveLinkBetweenNode method which allows you to remove all the links in 2 nodes
-    */
-    if (bGRAIsOriented == false) {
+    unsigned int uiInputLinkSize;
+    unsigned int uiOutputLinkSize;
 
-        for (unsigned int uiLoop = 0; uiLoop < uiGRASize; uiLoop++) {
+    CLink** ppLINInputLinks = pNODToRemove->NODGetInputLink(&uiInputLinkSize);
+    CLink** ppLINOutputLinks = pNODToRemove->NODGetOutputLink(&uiOutputLinkSize);
 
-            try {
-                GRARemoveLinkBetweenNode(uiValue, pNODGRANodeList[uiLoop]->NODGetValue());
-            }
-            catch (CException EXCError) {
+    for (unsigned int uiLoop = 0; uiLoop < uiInputLinkSize; uiLoop++) {
+
+        try {
+            GRARemoveLinkBetweenNode(ppLINInputLinks[uiLoop]->LINGetEnd(), pNODToRemove->NODGetValue());
+        }
+        catch (CException EXCError) {
                 //Ignored : there is just no link
-            }
-
         }
 
     }
-    else {  //If the graph is oriented, it needs to be removed more methodically
 
-        //We remove all the links in destination of this node
-        for (unsigned int uiLoop = 0; uiLoop < uiGRASize; uiLoop++) {
+    for (unsigned int uiLoop = 0; uiLoop < uiOutputLinkSize; uiLoop++) {
 
-            CLink* pLINFound = nullptr;
-            try{
-                pLINFound = pNODGRANodeList[uiLoop]->NODGetLinkTowardNode(uiValue);
-            }
-            catch (CException EXCErrorIgnored) {
-                //Ignored: there is no link
-            }
-            if (pLINFound != nullptr) {
-                pNODToRemove->NODRemoveInputLink(*pLINFound);
-                pNODGRANodeList[uiLoop]->NODRemoveOutputLink(*pLINFound);
-                delete(pLINFound);
-            }
-
+        try {
+            GRARemoveLinkBetweenNode(pNODToRemove->NODGetValue(),ppLINOutputLinks[uiLoop]->LINGetEnd());
+        }
+        catch (CException EXCError) {
+            //Ignored : there is just no link
         }
 
-        //We remove all the links starting on this node
-        //Note: We could also have used the same principe as before but this time we will take advantage of the getters
-
-        //we get all the outputs of the node that we want to delete
-        unsigned int uiSize = 0;
-        CLink** ppLINOutputLinkFromNode = pNODToRemove->NODGetOutputLink(&uiSize);
-
-        for (unsigned int uiLoop = 0; uiLoop < uiSize; uiLoop++) {
-
-            CLink* pLINFound = pNODToRemove->NODGetLinkTowardNode(pNODGRANodeList[uiLoop]->NODGetValue());
-            if (pLINFound != nullptr) {
-                pNODToRemove->NODRemoveOutputLink(*pLINFound);
-                pNODGRANodeList[uiLoop]->NODRemoveInputLink(*pLINFound);
-                delete(pLINFound);
-            }
-
-        }
-
-    }//else 
+    }
 
     //Remove the node from the list
-    for (unsigned int uiLoop = 0; uiLoop < uiGRASize - 1; uiLoop++) {
+    for (unsigned int uiLoop = uiIndexNode; uiLoop < uiGRASize - 1; uiLoop++) {
 
-        if (pNODGRANodeList[uiLoop] == pNODToRemove) {
+        pNODGRANodeList[uiLoop] = *(pNODGRANodeList + 1);
 
-            for (unsigned int uiLoopEnd = uiLoop; uiLoopEnd < uiGRASize - 1; uiLoopEnd++) {
-                pNODGRANodeList[uiLoopEnd] = *(pNODGRANodeList + uiLoopEnd + 1);
-            }
-
-        }
     }
 
     //all links and references to or from this node have been removed from other nodes and the graph
 
-    delete pNODToRemove;
-
     uiGRASize--;
-    CNode** pNODTemp = (CNode**)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode*));
+    CNode* pNODTemp = (CNode*)realloc(pNODGRANodeList, uiGRASize * sizeof(CNode));
     if (pNODTemp == nullptr && uiGRASize > 0) {
         throw CException(EXCEPTION_MallocError);
     }
@@ -474,8 +429,8 @@ CNode* CGraph::GRAGetNode(unsigned int uiNumber) {
 
     for (unsigned int uiLoop = 0; uiLoop < uiGRASize; uiLoop++) {
 
-        if (pNODGRANodeList[uiLoop]->NODGetValue() == uiNumber)
-            pNODFound = pNODGRANodeList[uiLoop];
+        if (pNODGRANodeList[uiLoop].NODGetValue() == uiNumber)
+            pNODFound = (pNODGRANodeList+uiLoop);
     }
 
     //If the node wasn't found

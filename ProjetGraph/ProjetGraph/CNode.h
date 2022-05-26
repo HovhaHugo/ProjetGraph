@@ -28,10 +28,12 @@ public:
 	void NODShow();
 	CLink* NODGetLinkTowardNode(unsigned int uiDestination);
 
-	void NODAddInputLink(CLink& pLINParam);
-	void NODAddOutputLink(CLink& pLINParam);
-	void NODRemoveInputLink(CLink& pLINParam);
-	void NODRemoveOutputLink(CLink& pLINParam);
+	void NODAddInputLink(CLink &LINToAdd);
+	void NODAddOutputLink(CLink& LINToAdd);
+	void NODAddInputLink(unsigned int uiDestination);
+	void NODAddOutputLink(unsigned int uiDestination);
+	void NODRemoveInputLink(unsigned int uiDestinationNode);
+	void NODRemoveOutputLink(unsigned int uiDestinationNode);
 
 
 	//Getters and setters

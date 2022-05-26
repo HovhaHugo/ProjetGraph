@@ -133,13 +133,13 @@ unsigned int CParser::PARGetNumber(const char* pcIdentifier) {
 /***
 * Get the list of nodes
 * Input: uiNodeListSize : unsigned int
-* Output: piFrom : CNode*
+* Output: CNode*
 * Precondition: uiNodeListSize is the number read with PARGetNumber(const char* pcIdentifier)
 * Postcondition: If the number of CNode read is the same as uiNodeListSize, the list of CNode is returned
 ***/
-CNode** CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier) {
+CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier) {
 
-    CNode** pNODNodeList = (CNode**)malloc(uiNodeListSize * sizeof(CNode*));
+    CNode* pNODNodeList = (CNode*)calloc(uiNodeListSize,sizeof(CNode));
     if (pNODNodeList == nullptr) {
         throw CException(EXCEPTION_MallocError);
     }
@@ -192,8 +192,7 @@ CNode** CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifi
             throw CException(EXCEPTION_invalide_number);
         }
 
-        CNode* pcNewNode = new CNode(iNodeNumber);
-        pNODNodeList[uiNbOfNodeFound-1] = pcNewNode;
+        pNODNodeList[uiNbOfNodeFound-1] = CNode(iNodeNumber);
         
     }//while(bContinueRead)
 

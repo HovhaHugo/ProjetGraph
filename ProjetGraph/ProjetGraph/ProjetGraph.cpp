@@ -18,19 +18,19 @@ int main()
         test->GRAShow();
 
         /*
+        
         CGraph* test = new CGraph();
-        CNode node1 = new CNode(1);
         //CNode node2 = new CNode(2);
         test->GRAAddNode(1);
         test->GRAAddNode(2);
         test->GRAAddNode(3);
         test->GRAAddLinkBetweenNode(1, 2);
 
-        cout << "Premier affichage " << endl;
+        cout << "Premier affichage, ajout d'un lien de 1 vers 2 " << endl;
         test->GRAShow();
 
         test->GRAAddLinkBetweenNode(2, 1);
-        cout << "\nDeuxieme affichage " << endl;
+        cout << "\nDeuxieme affichage, ajout d'un lien de 2 vers 1" << endl;
         test->GRAShow();
 
         test->GRARemoveLinkBetweenNode(1, 2);
@@ -47,22 +47,30 @@ int main()
 
         test->GRARemoveNode(3);
         cout << "\nSixieme affichage, on supprime le noeud 3 " << endl;
-        test->GRAShow();*/
+        test->GRAShow();
 
+        CGraph* copy = new CGraph(test);
+
+        cout << "\nSeptieme affichage, on affiche la copie du graphe " << endl;
+        copy->GRAShow();
+
+        CGraph* inverse = copy->GRAInverse();
+
+        cout << "\nHuitieme affichage, on affiche le graphe inverse " << endl;
+        inverse->GRAShow();
+
+        delete test;
+
+        cout << "\nNeuvieme affichage, on affiche la copie du graphe " << endl;
+        copy->GRAShow();
+        //On ne peut pas delete copy car je sais pas pourquoi mais après avoir supprime
+        // test, les liens de copy sont aussi supprimes, alors qu'ils ont ete cree avec new. A voir comment ca fonctionne
+        delete copy;
+
+        */
     }
     catch (CException EXCError) {
         cout << "Error " << EXCError.EXCgetValue() << endl;
     }
     
 }
-
-// Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage
-// Déboguer le programme : F5 ou menu Déboguer > Démarrer le débogage
-
-// Astuces pour bien démarrer : 
-//   1. Utilisez la fenêtre Explorateur de solutions pour ajouter des fichiers et les gérer.
-//   2. Utilisez la fenêtre Team Explorer pour vous connecter au contrôle de code source.
-//   3. Utilisez la fenêtre Sortie pour voir la sortie de la génération et d'autres messages.
-//   4. Utilisez la fenêtre Liste d'erreurs pour voir les erreurs.
-//   5. Accédez à Projet > Ajouter un nouvel élément pour créer des fichiers de code, ou à Projet > Ajouter un élément existant pour ajouter des fichiers de code existants au projet.
-//   6. Pour rouvrir ce projet plus tard, accédez à Fichier > Ouvrir > Projet et sélectionnez le fichier .sln.

@@ -9,7 +9,7 @@
 class CGraph
 {
 private:
-	CNode** pNODGRANodeList;
+	CNode* pNODGRANodeList;
 	unsigned int uiGRASize;
 	bool bGRAIsOriented;
 

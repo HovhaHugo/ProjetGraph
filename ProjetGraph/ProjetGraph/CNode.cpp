@@ -18,7 +18,7 @@ CNode::CNode() {
 	uiNODInputSize = 0;
 	uiNODOutputSize = 0;
 	ppLINNODInputLink = (CLink**)malloc(uiNODInputSize * sizeof(CLink*));
-	ppLINNODOutputLink = (CLink**)malloc(uiNODInputSize * sizeof(CLink*));
+	ppLINNODOutputLink = (CLink**)malloc(uiNODOutputSize * sizeof(CLink*));
 }
 
 /**
@@ -30,8 +30,22 @@ CNode::CNode() {
  */
 CNode::CNode(CNode* pNODToCopy) {
 	uiNODValue = pNODToCopy->NODGetValue();
-	ppLINNODInputLink = pNODToCopy->NODGetInputLink(&uiNODInputSize);
-	ppLINNODOutputLink = pNODToCopy->NODGetOutputLink(&uiNODOutputSize);
+
+	uiNODInputSize = pNODToCopy->uiNODInputSize;
+	uiNODOutputSize = pNODToCopy->uiNODOutputSize;
+
+	ppLINNODInputLink = (CLink**)malloc(uiNODInputSize * sizeof(CLink*));
+	ppLINNODOutputLink = (CLink**)malloc(uiNODOutputSize * sizeof(CLink*));
+
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+		CLink* pLINCopy = new CLink(pNODToCopy->ppLINNODInputLink[uiLoop]);
+		NODAddInputLink(*pLINCopy);
+	}
+
+	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
+		CLink* pLINCopy = new CLink(pNODToCopy->ppLINNODOutputLink[uiLoop]);
+		NODAddOutputLink(*pLINCopy);
+	}
 }
 
 
@@ -60,11 +74,8 @@ CNode::CNode(unsigned int uiParam) {
  */
 CNode::~CNode() {
 
-	if (uiNODInputSize > 0 || uiNODOutputSize > 0) {
-		throw CException(EXCEPTION_TRY_DELETE_USED_NODE);
-	}
-
-	//faire les free
+	// Je sais pas quoi mettre. Le graphe s'occupe deja de vider le noeuds, mais des fois
+	//cette fonction est appelee pour la destruction d'objet automatique, c'est chelou et ca fait crash
 
 }
 
@@ -82,6 +93,11 @@ CNode::~CNode() {
  */
 void CNode::NODShow() {
 	cout << "Node value : " << uiNODValue << endl;
+
+	cout << "Input links :" << endl;
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+		ppLINNODInputLink[uiLoop]->LINShow();
+	}
 
 	cout << "Output links :" << endl;
 	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
@@ -125,11 +141,16 @@ CLink* CNode::NODGetLinkTowardNode(unsigned int uiDestination) {
 
 // ******************* OVERLOADED OPERATOR					************************* //
 
+/**
+ * Overloaded = operator
+ * Input: pNODToCopy : CNode*
+ * Output: CNode*
+ * Precondition : /
+ * Postcondition : The copy constructor is called
+ */
 CNode* CNode::operator=(CNode* pNODToCopy) {
-	CNode* pNODNewNode = new CNode(pNODToCopy->NODGetValue());
 
-	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetInputLink(&pNODNewNode->uiNODInputSize);
-	pNODNewNode->ppLINNODOutputLink = pNODToCopy->NODGetOutputLink(&pNODNewNode->uiNODOutputSize);
+	CNode* pNODNewNode = new CNode(pNODToCopy);
 
 	return pNODNewNode;
 }
@@ -141,12 +162,12 @@ CNode* CNode::operator=(CNode* pNODToCopy) {
 
 /**
  * Add an input link to the node
- * Input: pLinParam : CLink&
+ * Input: LINToAdd : CLink&
  * Output: /
  * Precondition : /
- * Postcondition : pLINParam has been added to the inputs links list, and uiNODInputSize has been incremented
+ * Postcondition : LINToAdd has been added to the inputs links list, and uiNODInputSize has been incremented
  */
-void CNode::NODAddInputLink(CLink& pLINParam) {
+void CNode::NODAddInputLink(CLink &LINToAdd) {
 
 	CLink** ppLINTemp = nullptr;
 
@@ -155,22 +176,22 @@ void CNode::NODAddInputLink(CLink& pLINParam) {
 
 	if (ppLINTemp != nullptr) {
 		ppLINNODInputLink = ppLINTemp;
-		ppLINNODInputLink[uiNODInputSize - 1] = &pLINParam;	//JE SUIS PAS DU TOUT SUR
+		ppLINNODInputLink[uiNODInputSize - 1] = &LINToAdd;
 	}
 	else
-		throw CException();
+		throw CException(EXCEPTION_MallocError);
 
 }
 
 
 /**
  * Add an output link to the node
- * Input: pLinParam : CLink&
+ * Input: LINToAdd : CLink&
  * Output: /
  * Precondition : /
  * Postcondition : pLINParam has been added to the outputs links list, and uiNODOuputSize has been incremented
  */
-void CNode::NODAddOutputLink(CLink& pLINParam) {
+void CNode::NODAddOutputLink(CLink& LINToAdd) {
 
 	CLink** ppLINTemp = nullptr;
 
@@ -179,37 +200,86 @@ void CNode::NODAddOutputLink(CLink& pLINParam) {
 
 	if (ppLINTemp != nullptr) {
 		ppLINNODOutputLink = ppLINTemp;
-		ppLINNODOutputLink[uiNODOutputSize - 1] = &pLINParam;	//JE SUIS PAS DU TOUT SUR
+		ppLINNODOutputLink[uiNODOutputSize - 1] = &LINToAdd;
 	}
 	else
-		throw CException();
+		throw CException(EXCEPTION_MallocError);
+
+}
+
+/**
+ * Add an input link to the node
+ * Input: uiDestination : unsigned int
+ * Output: /
+ * Precondition : uiDestination is a existing node value
+ * Postcondition : pLINParam has been added to the inputs links list, and uiNODInputSize has been incremented
+ */
+void CNode::NODAddInputLink(unsigned int uiDestination) {
+
+	CLink** ppLINTemp = nullptr;
+
+	uiNODInputSize++;
+	ppLINTemp = (CLink**)realloc(ppLINNODInputLink, uiNODInputSize * sizeof(CLink*));
+
+	if (ppLINTemp != nullptr) {
+		ppLINNODInputLink = ppLINTemp;
+		ppLINNODInputLink[uiNODInputSize - 1] = new CLink(uiDestination);
+	}
+	else
+		throw CException(EXCEPTION_MallocError);
+
+}
+
+
+/**
+ * Add an output link to the node
+ * Input: uiDestination : unsigned int
+ * Output: /
+ * Precondition : uiDestination is a existing node value
+ * Postcondition : pLINParam has been added to the outputs links list, and uiNODOuputSize has been incremented
+ */
+void CNode::NODAddOutputLink(unsigned int uiDestination) {
+
+	CLink** ppLINTemp = nullptr;
+
+	uiNODOutputSize++;
+	ppLINTemp = (CLink**)realloc(ppLINNODOutputLink, uiNODOutputSize * sizeof(CLink*));
+
+	if (ppLINTemp != nullptr) {
+		ppLINNODOutputLink = ppLINTemp;
+		ppLINNODOutputLink[uiNODOutputSize - 1] = new CLink(uiDestination);
+	}
+	else
+		throw CException(EXCEPTION_MallocError);
 
 }
 
 
 /**
  * Remove an input link to the node
- * Input: pLinParam : CLink&
+ * Input: uiDestination : unsigned int
  * Output: /
  * Precondition : /
- * Postcondition : If pLINParam isn't in the list an error is throw, else
-	pLINParam has been removed to the inputs links list, and uiNODInputSize has been decremented
+ * Postcondition : If uiDestination isn't found in the list an error is throw, else
+	the link has been removed to the inputs links list, and uiNODInputSize has been decremented
  */
-void CNode::NODRemoveInputLink(CLink& pLINParam) {
+void CNode::NODRemoveInputLink(unsigned int uiDestination) {
 
+	//Check if the link exist
 	unsigned int indexFound = 0;
-
 	bool bFound = false;
 	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
-		if (ppLINNODInputLink[uiLoop] == &pLINParam) {
+		if (ppLINNODInputLink[uiLoop]->LINGetEnd() == uiDestination) {
 			indexFound = uiLoop;
 			bFound = true;
+			delete ppLINNODInputLink[uiLoop];
 		}
 	}
 	if (bFound == false) {
 		throw CException(EXCEPTION_LINK_NOT_EXIST);
 	}
 
+	//shifts the remaining pointers
 	for (unsigned int uiLoop = indexFound; uiLoop < uiNODInputSize - 1; uiLoop++) {
 		ppLINNODInputLink[uiLoop] = ppLINNODInputLink[uiLoop + 1];
 	}
@@ -230,29 +300,32 @@ void CNode::NODRemoveInputLink(CLink& pLINParam) {
 
 /**
  * Remove an output link to the node
- * Input: pLinParam : CLink&
+ * Input: uiDestination : unsigned int
  * Output: /
  * Precondition : /
- * Postcondition : If pLINParam isn't in the list an error is throw, else
-	pLINParam has been removed to the outputs links list, and uiNODInputSize has been decremented
+ * Postcondition : If uiDestination isn't found in the list an error is throw, else
+	the link has been removed to the outputs links list, and uiNODInputSize has been decremented
  */
-void CNode::NODRemoveOutputLink(CLink& pLINParam) {
+void CNode::NODRemoveOutputLink(unsigned int uiDestination) {
 
+	//Check if the link exist
 	unsigned int indexFound = 0;
-
 	bool bFound = false;
+
 	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
-		if (ppLINNODOutputLink[uiLoop] == &pLINParam) {
+		if (ppLINNODOutputLink[uiLoop]->LINGetEnd() == uiDestination) {
 			indexFound = uiLoop;
 			bFound = true;
+			delete ppLINNODOutputLink[uiLoop];
 		}
 	}
 	if (bFound == false) {
 		throw CException(EXCEPTION_LINK_NOT_EXIST);
 	}
 
+	//shifts the remaining pointers
 	for (unsigned unsigned int uiLoop = indexFound; uiLoop < uiNODOutputSize - 1; uiLoop++) {
-		ppLINNODOutputLink[uiLoop] = ppLINNODInputLink[uiLoop + 1];
+		ppLINNODOutputLink[uiLoop] = ppLINNODOutputLink[uiLoop + 1];
 	}
 
 	CLink** ppLINTemp = nullptr;
@@ -264,7 +337,7 @@ void CNode::NODRemoveOutputLink(CLink& pLINParam) {
 		ppLINNODOutputLink = ppLINTemp;
 	}
 	else
-		throw CException();
+		throw CException(EXCEPTION_MallocError);
 
 }
 
@@ -288,16 +361,13 @@ unsigned int CNode::NODGetValue() {
  * Setter of uiNODValue
  * Input: uiValue: unsigned int
  * Output: /
- * Precondition : /
- * Postcondition : uiNODValue = uiValue and all input links have been updated
- *
+ * Precondition : 
+ * To keep the integrity of the graph, all the links in the other nodes referring
+	to this one must have been modified. This method must be called via the GRAChangeNodeValue method
+ * Postcondition : uiNODValue = uiValue
  */
 void CNode::NODSetValue(unsigned int uiValue) {
 	uiNODValue = uiValue;
-
-	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
-		ppLINNODInputLink[uiLoop]->LINSetEnd(uiValue);
-	}
 }
 
 
@@ -322,5 +392,5 @@ CLink** CNode::NODGetInputLink(unsigned int* uiSize) {
  */
 CLink** CNode::NODGetOutputLink(unsigned int* uiSize) {
 	*uiSize = uiNODOutputSize;
-	return ppLINNODInputLink;
+	return ppLINNODOutputLink;
 }

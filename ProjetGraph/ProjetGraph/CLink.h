@@ -6,9 +6,11 @@ private:
 
 public:
 	CLink();
-	CLink(unsigned int uiDestination);
+	CLink(unsigned int uiEnd);
 	CLink(CLink* pLINToCopy);
 	~CLink();
+
+	CLink* operator=(CLink* pLINToCopy);
 
 	void LINShow();
 

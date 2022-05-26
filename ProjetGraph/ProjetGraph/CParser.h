@@ -28,7 +28,7 @@ private:
 public:
 	CParser(const char* pcFilePathParam);
 	unsigned int PARGetNumber(const char* pcIdentifier);
-	CNode** PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier);
+	CNode* PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier);
 	void PARGetLink(int* piFrom, int* piTo, unsigned int iSize, const char* pcIdentifier);
 
 

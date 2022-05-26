@@ -23,8 +23,8 @@ CLink::CLink() {
  * Precondition : /
  * Postcondition : the object has been created in memory with uiNODEnd = uiDestination
  */
-CLink::CLink(unsigned int uiDestination) {
-	uiLINEnd = uiDestination;
+CLink::CLink(unsigned int uiEnd) {
+	uiLINEnd = uiEnd;
 }
 
 
@@ -49,6 +49,18 @@ CLink::CLink(CLink* pLINToCopy) {
 */
 CLink::~CLink() {
 
+}
+
+/**
+ * Overloaded = operator
+ * Input: pNODToCopy : CNode*
+ * Output: /
+ * Precondition : /
+ * Postcondition : The copy constructor is called
+ */
+CLink* CLink::operator=(CLink* pLINToCopy) {
+
+	return new CLink(pLINToCopy);
 }
 
 
