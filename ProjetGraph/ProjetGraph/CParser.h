@@ -20,15 +20,15 @@ class CParser
 {
 
 private:
-	char* pcPARFilePath;
+	const char* pcPARFilePath;
 	const char cPARSeparator = '=';
 	void PARToUpper(char* pcOutput, const char* pcOrigin);
 	char* PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier);
 
 public:
-	CParser(char* pcFilePathParam);
+	CParser(const char* pcFilePathParam);
 	unsigned int PARGetNumber(const char* pcIdentifier);
-	CNode* PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier);
+	CNode** PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier);
 	void PARGetLink(int* piFrom, int* piTo, unsigned int iSize, const char* pcIdentifier);
 
 

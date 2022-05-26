@@ -11,7 +11,7 @@
 * Postcondition: The object is initialized if the pcFilePathParam file was successfully opened.
 *   In this case, pcPARFilePath = pcFilePathParam
 ***/
-CParser::CParser(char* pcFilePathParam) {
+CParser::CParser(const char* pcFilePathParam) {
 
     pcPARFilePath = pcFilePathParam;
 
@@ -48,15 +48,7 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
 
     PARToUpper(pcIdentifierUpper, pcIdentifier);
 
-    char* pcDataToReturn = (char*)malloc(sizeof(char)*LINE_LENGTH);
-    if (pcDataToReturn == nullptr) {
-        free(pcIdentifierUpper);
-        throw CException(EXCEPTION_MallocError);
-    }
-
-    //Default data
-    const char* pcNullIdentifier = "\0";
-    sprintf_s(pcDataToReturn, LINE_LENGTH, pcNullIdentifier);
+    char* pcDataToReturn = nullptr;
 
     while (bContinueRead) {
 
@@ -79,7 +71,7 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
         PARToUpper(pcLabelUpper, pcLineIdentifier);
 
         //Check if the label is the one we are looking for
-        if (strncmp(pcLineIdentifier, pcLabelUpper, strlen(pcLineIdentifier)) == 0) {
+        if (strncmp(pcIdentifierUpper, pcLabelUpper, strlen(pcLineIdentifier)) == 0) {
 
             //pcLineIdentifier contains now the data to get
             pcLineIdentifier = strtok(nullptr, " ");
@@ -88,8 +80,9 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
                 free(pcIdentifierUpper);
                 throw CException(EXCEPTION_ErrorDataFile);
             }
-
             bContinueRead = false;
+            pcDataToReturn = pcLineIdentifier;
+
         }
 
         free(pcLabelUpper);
@@ -144,9 +137,9 @@ unsigned int CParser::PARGetNumber(const char* pcIdentifier) {
 * Precondition: uiNodeListSize is the number read with PARGetNumber(const char* pcIdentifier)
 * Postcondition: If the number of CNode read is the same as uiNodeListSize, the list of CNode is returned
 ***/
-CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier) {
+CNode** CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifier) {
 
-    CNode* pNODNodeList = (CNode*)malloc(uiNodeListSize * sizeof(CNode));
+    CNode** pNODNodeList = (CNode**)malloc(uiNodeListSize * sizeof(CNode*));
     if (pNODNodeList == nullptr) {
         throw CException(EXCEPTION_MallocError);
     }
@@ -199,7 +192,8 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifie
             throw CException(EXCEPTION_invalide_number);
         }
 
-        *(pNODNodeList+uiNbOfNodeFound-1) = new CNode(iNodeNumber);
+        CNode* pcNewNode = new CNode(iNodeNumber);
+        pNODNodeList[uiNbOfNodeFound-1] = pcNewNode;
         
     }//while(bContinueRead)
 

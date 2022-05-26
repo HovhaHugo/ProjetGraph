@@ -15,7 +15,7 @@ private:
 
 public:
 	CGraph();
-	CGraph(char* pcFilePath);
+	CGraph(const char* pcFilePath);
 	CGraph(CGraph* pGRAToCopy);
 	~CGraph();
 

@@ -25,7 +25,7 @@ CGraph::CGraph() {
  * Precondition : /
  * Postcondition : the object has been created in memory with uiGRASize = 0 and pNODGRANodeList = nullptr
  */
-CGraph::CGraph(char* pcFilePath) {
+CGraph::CGraph(const char* pcFilePath) {
     //Appel du parseur
     CParser* pPARParser;
     try {
@@ -38,10 +38,10 @@ CGraph::CGraph(char* pcFilePath) {
     //The parser doesn't know if the graph is oriented
     bGRAIsOriented = true;
 
-    unsigned int uiNbOfNode = pPARParser->PARGetNumber("NBSommets");
+    uiGRASize = pPARParser->PARGetNumber("NBSommets");
     unsigned int uiNbOfLink = pPARParser->PARGetNumber("NBArcs");
 
-    CNode* pNODNodeList = pPARParser->PARGetNodes(uiNbOfNode,"Sommets");
+    pNODGRANodeList = pPARParser->PARGetNodes(uiGRASize,"Sommets");
 
     //temporary lists of link data are created in memory 
     int* piListLinkFrom = (int*)malloc(sizeof(int) * uiNbOfLink);

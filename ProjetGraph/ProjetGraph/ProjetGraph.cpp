@@ -10,6 +10,14 @@ using namespace std;
 int main()
 {
     try {
+
+        const char* path = "C:\\Users\\mathi\\OneDrive\\Bureau\\test.txt";
+
+        CGraph* test = new CGraph(path);
+
+        test->GRAShow();
+
+        /*
         CGraph* test = new CGraph();
         CNode node1 = new CNode(1);
         //CNode node2 = new CNode(2);
@@ -39,7 +47,7 @@ int main()
 
         test->GRARemoveNode(3);
         cout << "\nSixieme affichage, on supprime le noeud 3 " << endl;
-        test->GRAShow();
+        test->GRAShow();*/
 
     }
     catch (CException EXCError) {
