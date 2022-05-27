@@ -109,7 +109,37 @@ void CNode::NODShow() {
 
 
 /**
- * Lets you know if the node contains a link to another node in particular
+ * Lets you know if the node contains a link from another node
+ * Input: uiDestination : unsigned int
+ * Output: CLink*
+ * Precondition : /
+ * Postcondition : If there is a link in the current node comming from
+ *	the node with uiDestination value,the returned value contains the link.
+ *	Else, a error is thrown
+ */
+CLink* CNode::NODGetLinkFromNode(unsigned int uiFrom) {
+
+	CLink* pLINFound = nullptr;
+
+	//We search in all the output links
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+		if (ppLINNODInputLink[uiLoop]->LINGetEnd() == uiFrom) {
+			pLINFound = ppLINNODInputLink[uiLoop];
+			break;
+		}
+	}
+
+	if (pLINFound == nullptr) {
+		throw CException(EXCEPTION_LINK_NOT_EXIST);
+	}
+
+	return pLINFound;
+
+}
+
+
+/**
+ * Lets you know if the node contains a link to another node
  * Input: uiDestination : unsigned int
  * Output: CLink*
  * Precondition : /
@@ -179,7 +209,7 @@ void CNode::NODAddInputLink(CLink &LINToAdd) {
 		ppLINNODInputLink[uiNODInputSize - 1] = &LINToAdd;
 	}
 	else
-		throw CException(EXCEPTION_MallocError);
+		throw CException(EXCEPTION_MALLOC_ERROR);
 
 }
 
@@ -203,7 +233,7 @@ void CNode::NODAddOutputLink(CLink& LINToAdd) {
 		ppLINNODOutputLink[uiNODOutputSize - 1] = &LINToAdd;
 	}
 	else
-		throw CException(EXCEPTION_MallocError);
+		throw CException(EXCEPTION_MALLOC_ERROR);
 
 }
 
@@ -226,7 +256,7 @@ void CNode::NODAddInputLink(unsigned int uiDestination) {
 		ppLINNODInputLink[uiNODInputSize - 1] = new CLink(uiDestination);
 	}
 	else
-		throw CException(EXCEPTION_MallocError);
+		throw CException(EXCEPTION_MALLOC_ERROR);
 
 }
 
@@ -250,7 +280,7 @@ void CNode::NODAddOutputLink(unsigned int uiDestination) {
 		ppLINNODOutputLink[uiNODOutputSize - 1] = new CLink(uiDestination);
 	}
 	else
-		throw CException(EXCEPTION_MallocError);
+		throw CException(EXCEPTION_MALLOC_ERROR);
 
 }
 
@@ -293,7 +323,7 @@ void CNode::NODRemoveInputLink(unsigned int uiDestination) {
 		ppLINNODInputLink = ppLINTemp;
 	}
 	else
-		throw CException(EXCEPTION_MallocError);
+		throw CException(EXCEPTION_MALLOC_ERROR);
 
 }
 
@@ -337,7 +367,7 @@ void CNode::NODRemoveOutputLink(unsigned int uiDestination) {
 		ppLINNODOutputLink = ppLINTemp;
 	}
 	else
-		throw CException(EXCEPTION_MallocError);
+		throw CException(EXCEPTION_MALLOC_ERROR);
 
 }
 

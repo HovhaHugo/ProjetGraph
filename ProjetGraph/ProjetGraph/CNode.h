@@ -4,7 +4,7 @@
 
 #define EXCEPTION_LINK_NOT_EXIST 2
 #define EXCEPTION_TRY_DELETE_USED_NODE 3
-#define EXCEPTION_MallocError 6			//Memory allocation error
+#define EXCEPTION_MALLOC_ERROR 6			//Memory allocation error
 
 
 class CNode
@@ -27,6 +27,7 @@ public:
 	//Methods
 	void NODShow();
 	CLink* NODGetLinkTowardNode(unsigned int uiDestination);
+	CLink* NODGetLinkFromNode(unsigned int uiFrom);
 
 	void NODAddInputLink(CLink &LINToAdd);
 	void NODAddOutputLink(CLink& LINToAdd);

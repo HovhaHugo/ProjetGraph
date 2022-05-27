@@ -26,6 +26,7 @@ public:
 	void GRAChangeLinkDestination(unsigned int uiVNodeSource, unsigned int uiVNodeOldDestination, unsigned int uiVNodeNewDestination);
 	CNode* GRAAddNode(unsigned int uiNodeValue);
 	void GRARemoveNode(unsigned int uiValue);
+	void GRAChangeNodeValue(unsigned int uiOldValue, unsigned int uiNewValue);
 
 	CNode* GRAGetNode(unsigned int uiNumber);
 	bool GRAGetIsOriented();

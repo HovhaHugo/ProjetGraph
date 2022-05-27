@@ -18,7 +18,7 @@ CParser::CParser(const char* pcFilePathParam) {
     ifstream fichier(pcPARFilePath);
 
     if (!fichier.is_open()) {
-        CException EXCError(EXCEPTION_MissingFile);
+        CException EXCError(EXCEPTION_MISSING_FILE);
         throw EXCError;
     }
 
@@ -43,7 +43,7 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
     //Put the word to upper to avoid case error
     char* pcIdentifierUpper = (char*)malloc(sizeof(char) * LINE_LENGTH);
     if (pcIdentifierUpper == nullptr) {
-        throw CException(EXCEPTION_MallocError);
+        throw CException(EXCEPTION_MALLOC_ERROR);
     }
 
     PARToUpper(pcIdentifierUpper, pcIdentifier);
@@ -66,7 +66,7 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
         char* pcLabelUpper = (char*)malloc(sizeof(char) * LINE_LENGTH);
         if (pcLabelUpper == nullptr) {
             free(pcIdentifierUpper);
-            throw CException(EXCEPTION_MallocError);
+            throw CException(EXCEPTION_MALLOC_ERROR);
         }
         PARToUpper(pcLabelUpper, pcLineIdentifier);
 
@@ -78,7 +78,7 @@ char* CParser::PARJumpToIdentifier(ifstream *ifFile, const char* pcIdentifier) {
             if (pcLineIdentifier == nullptr) {
                 free(pcLabelUpper);
                 free(pcIdentifierUpper);
-                throw CException(EXCEPTION_ErrorDataFile);
+                throw CException(EXCEPTION_ERROR_DATA_FILE);
             }
             bContinueRead = false;
             pcDataToReturn = pcLineIdentifier;
@@ -117,12 +117,12 @@ unsigned int CParser::PARGetNumber(const char* pcIdentifier) {
     iNbFound = strtod(pcData, &pcEndPtr);
 
     if (pcEndPtr == pcData) {
-        throw CException(EXCEPTION_ConversionError);
+        throw CException(EXCEPTION_CONVERSION_ERROR);
     }
 
     //Check validity of number
     if (iNbFound < 0) {
-        throw CException(EXCEPTION_invalide_number);
+        throw CException(EXCEPTION_INVALID_NUMBER);
     }
 
     return iNbFound;
@@ -141,7 +141,7 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifie
 
     CNode* pNODNodeList = (CNode*)calloc(uiNodeListSize,sizeof(CNode));
     if (pNODNodeList == nullptr) {
-        throw CException(EXCEPTION_MallocError);
+        throw CException(EXCEPTION_MALLOC_ERROR);
     }
 
     ifstream ifFile(pcPARFilePath);
@@ -177,19 +177,19 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifie
 
         if (pcEndPtr == pcNodeNumber) {
             free(pNODNodeList);
-            throw CException(EXCEPTION_ConversionError);
+            throw CException(EXCEPTION_CONVERSION_ERROR);
         }
 
         if (iNodeNumber < 0) {
             free(pNODNodeList);
-            throw CException(EXCEPTION_invalide_number);
+            throw CException(EXCEPTION_INVALID_NUMBER);
         }
 
         uiNbOfNodeFound++;
 
         if (uiNbOfNodeFound > uiNodeListSize) {
             free(pNODNodeList);
-            throw CException(EXCEPTION_invalide_number);
+            throw CException(EXCEPTION_INVALID_NUMBER);
         }
 
         pNODNodeList[uiNbOfNodeFound-1] = CNode(iNodeNumber);
@@ -198,7 +198,7 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifie
 
     if (uiNbOfNodeFound > uiNodeListSize) {
         free(pNODNodeList);
-        throw CException(EXCEPTION_invalide_number);
+        throw CException(EXCEPTION_INVALID_NUMBER);
     }
 
     return pNODNodeList;
@@ -247,7 +247,7 @@ void CParser::PARGetLink(int* piFrom, int* piTo, unsigned int iSize, const char*
         int iNodeNumberFrom = strtod(pcLine, &pcEndPtr);
 
         if (pcEndPtr == pcLine) {
-            throw CException(EXCEPTION_ConversionError);
+            throw CException(EXCEPTION_CONVERSION_ERROR);
         }
 
         pcLine = strtok(nullptr, "=");
@@ -256,7 +256,7 @@ void CParser::PARGetLink(int* piFrom, int* piTo, unsigned int iSize, const char*
         int iNodeNumberTo = strtod(pcLine, &pcEndPtr);
 
         if (pcEndPtr == pcLine) {
-            throw CException(EXCEPTION_ConversionError);
+            throw CException(EXCEPTION_CONVERSION_ERROR);
         }
 
         uiNbOfLinkFound++;

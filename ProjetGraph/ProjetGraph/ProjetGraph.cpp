@@ -11,13 +11,13 @@ int main()
 {
     try {
 
-        const char* path = "C:\\Users\\mathi\\OneDrive\\Bureau\\test.txt";
+        /*const char* path = "C:\\Users\\mathi\\OneDrive\\Bureau\\test.txt";
 
         CGraph* test = new CGraph(path);
 
-        test->GRAShow();
+        test->GRAShow();*/
 
-        /*
+        
         
         CGraph* test = new CGraph();
         //CNode node2 = new CNode(2);
@@ -41,8 +41,12 @@ int main()
         cout << "\nQuatrieme affichage, on remet un lien 1 vers 2 " << endl;
         test->GRAShow();
 
-        test->GRAChangeLinkDestination(1, 2, 3);
-        cout << "\nCinquieme affichage, on change la destination de 1 vers 2 a 1 vers 3 " << endl;
+        test->GRAChangeNodeValue(1,4);
+        cout << "\nQuatrieme 2 affichage, on change le noeud 1 a 4 " << endl;
+        test->GRAShow();
+
+        test->GRAChangeLinkDestination(4, 2, 3);
+        cout << "\nCinquieme affichage, on change la destination de 4 vers 2 a 4 vers 3 " << endl;
         test->GRAShow();
 
         test->GRARemoveNode(3);
@@ -65,9 +69,9 @@ int main()
         copy->GRAShow();
         //On ne peut pas delete copy car je sais pas pourquoi mais après avoir supprime
         // test, les liens de copy sont aussi supprimes, alors qu'ils ont ete cree avec new. A voir comment ca fonctionne
-        delete copy;
+        //delete copy;
 
-        */
+        
     }
     catch (CException EXCError) {
         cout << "Error " << EXCError.EXCgetValue() << endl;
