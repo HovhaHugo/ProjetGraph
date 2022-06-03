@@ -3,7 +3,7 @@
 #include "CNode.h"
 
 #define EXCEPTION_NODE_NOT_FOUND 1
-#define EXCEPTION_INCOHERENCE 4			//Un lien n'est reference que d'un seul cote
+#define EXCEPTION_INCOHERENCE 2			//Un lien n'est reference que d'un seul cote
 
 
 class CGraph

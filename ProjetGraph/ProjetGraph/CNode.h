@@ -2,9 +2,8 @@
 
 #include "CLink.h"
 
-#define EXCEPTION_LINK_NOT_EXIST 2
-#define EXCEPTION_TRY_DELETE_USED_NODE 3
 #define EXCEPTION_MALLOC_ERROR 6			//Memory allocation error
+#define EXCEPTION_LINK_NOT_EXIST 8
 
 
 class CNode
@@ -39,9 +38,11 @@ public:
 
 	//Getters and setters
 	unsigned int NODGetValue();
+	unsigned int NODGetInputSize();
+	unsigned int NODGetOutputSize();
 	void NODSetValue(unsigned int uiValue);
-	CLink** NODGetInputLink(unsigned int* uiSize);
-	CLink** NODGetOutputLink(unsigned int* uiSize);
+	CLink** NODGetInputLink();
+	CLink** NODGetOutputLink();
 
 };
 

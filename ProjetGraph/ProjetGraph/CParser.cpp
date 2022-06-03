@@ -214,7 +214,7 @@ CNode* CParser::PARGetNodes(unsigned int uiNodeListSize, const char* pcIdentifie
 * Precondition: piFrom and piTo are allocated in memory with a space of iSize int
 * Postcondition: piFrom contains the list of the begins of the links, piTo contains the list of ends.
 ***/
-void CParser::PARGetLink(int* piFrom, int* piTo, unsigned int iSize, const char* pcIdentifier) {
+void CParser::PARGetLink(int* piFrom, int* piTo, unsigned int uiSize, const char* pcIdentifier) {
 
     ifstream ifFile(pcPARFilePath);
 
@@ -261,7 +261,7 @@ void CParser::PARGetLink(int* piFrom, int* piTo, unsigned int iSize, const char*
 
         uiNbOfLinkFound++;
 
-        if (uiNbOfLinkFound > iSize) {
+        if (uiNbOfLinkFound > uiSize) {
             throw CException();
         }
 

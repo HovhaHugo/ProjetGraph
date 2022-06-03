@@ -7,71 +7,35 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
+    unsigned int uiGraphNbRead = argc - 1;
+    if (uiGraphNbRead == 0) {
+        cerr << "ERREUR : Pas d'arguments passes en parametre" << endl;
+        return -1;
+    }
+
+    if (uiGraphNbRead > 1) {
+        cerr << "ERREUR : Trop d'arguments passes en parametre" << endl;
+        return -1;
+    }
+
+    cout << "Debut du test : " << endl;
     try {
 
-        /*const char* path = "C:\\Users\\mathi\\OneDrive\\Bureau\\test.txt";
+        cout << "---------------------------" << endl;
+        cout << "\nAffichage du graphe :\n" << endl;
+        CGraph* pGRAGraphTest = new CGraph(argv[1]);
 
-        CGraph* test = new CGraph(path);
+        pGRAGraphTest->GRAShow();
 
-        test->GRAShow();*/
-
-        
-        
-        CGraph* test = new CGraph();
-        //CNode node2 = new CNode(2);
-        test->GRAAddNode(1);
-        test->GRAAddNode(2);
-        test->GRAAddNode(3);
-        test->GRAAddLinkBetweenNode(1, 2);
-
-        cout << "Premier affichage, ajout d'un lien de 1 vers 2 " << endl;
-        test->GRAShow();
-
-        test->GRAAddLinkBetweenNode(2, 1);
-        cout << "\nDeuxieme affichage, ajout d'un lien de 2 vers 1" << endl;
-        test->GRAShow();
-
-        test->GRARemoveLinkBetweenNode(1, 2);
-        cout << "\nTroisieme affichage, apres suppression du lien 1 vers 2 " << endl;
-        test->GRAShow();
-
-        test->GRAAddLinkBetweenNode(1, 2);
-        cout << "\nQuatrieme affichage, on remet un lien 1 vers 2 " << endl;
-        test->GRAShow();
-
-        test->GRAChangeNodeValue(1,4);
-        cout << "\nQuatrieme 2 affichage, on change le noeud 1 a 4 " << endl;
-        test->GRAShow();
-
-        test->GRAChangeLinkDestination(4, 2, 3);
-        cout << "\nCinquieme affichage, on change la destination de 4 vers 2 a 4 vers 3 " << endl;
-        test->GRAShow();
-
-        test->GRARemoveNode(3);
-        cout << "\nSixieme affichage, on supprime le noeud 3 " << endl;
-        test->GRAShow();
-
-        CGraph* copy = new CGraph(test);
-
-        cout << "\nSeptieme affichage, on affiche la copie du graphe " << endl;
-        copy->GRAShow();
-
-        CGraph* inverse = copy->GRAInverse();
-
-        cout << "\nHuitieme affichage, on affiche le graphe inverse " << endl;
+        CGraph* inverse = pGRAGraphTest->GRAInverse();
+        cout << "---------------------------" << endl;
+        cout << "\nAffichage de l'inverse :\n" << endl;
         inverse->GRAShow();
 
-        delete test;
+        cout << "---------------------------" << endl;
 
-        cout << "\nNeuvieme affichage, on affiche la copie du graphe " << endl;
-        copy->GRAShow();
-        //On ne peut pas delete copy car je sais pas pourquoi mais après avoir supprime
-        // test, les liens de copy sont aussi supprimes, alors qu'ils ont ete cree avec new. A voir comment ca fonctionne
-        //delete copy;
-
-        
     }
     catch (CException EXCError) {
         cout << "Error " << EXCError.EXCgetValue() << endl;

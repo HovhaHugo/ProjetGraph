@@ -73,10 +73,13 @@ CNode::CNode(unsigned int uiParam) {
  * Postcondition : the object has been deleted from memory
  */
 CNode::~CNode() {
+	for (unsigned int uiLoop = 0; uiLoop < uiNODInputSize; uiLoop++) {
+		delete ppLINNODInputLink[uiLoop];
+	}
 
-	// Je sais pas quoi mettre. Le graphe s'occupe deja de vider le noeuds, mais des fois
-	//cette fonction est appelee pour la destruction d'objet automatique, c'est chelou et ca fait crash
-
+	for (unsigned int uiLoop = 0; uiLoop < uiNODOutputSize; uiLoop++) {
+		delete ppLINNODOutputLink[uiLoop];
+	}
 }
 
 // ******************* END OF CONSTRUCTORS / DESTRUCTOR		************************* //
@@ -354,7 +357,7 @@ void CNode::NODRemoveOutputLink(unsigned int uiDestination) {
 	}
 
 	//shifts the remaining pointers
-	for (unsigned unsigned int uiLoop = indexFound; uiLoop < uiNODOutputSize - 1; uiLoop++) {
+	for (unsigned int uiLoop = indexFound; uiLoop < uiNODOutputSize - 1; uiLoop++) {
 		ppLINNODOutputLink[uiLoop] = ppLINNODOutputLink[uiLoop + 1];
 	}
 
@@ -386,6 +389,28 @@ unsigned int CNode::NODGetValue() {
 	return uiNODValue;
 }
 
+/**
+ * Getter of uiNODInputSize
+ * Input: /
+ * Output: unsigned int
+ * Precondition : /
+ * Postcondition : uiNODInputSize is returned
+ */
+unsigned int CNode::NODGetInputSize() {
+	return uiNODInputSize;
+}
+
+/**
+ * Getter of uiNODOutputSize
+ * Input: /
+ * Output: unsigned int
+ * Precondition : /
+ * Postcondition : uiNODOutputSize is returned
+ */
+unsigned int CNode::NODGetOutputSize() {
+	return uiNODOutputSize;
+}
+
 
 /**
  * Setter of uiNODValue
@@ -408,8 +433,7 @@ void CNode::NODSetValue(unsigned int uiValue) {
  * Precondition : /
  * Postcondition : uiNODValue is returned and uiSize = uiNODInputSize
  */
-CLink** CNode::NODGetInputLink(unsigned int* uiSize) {
-	*uiSize = uiNODInputSize;
+CLink** CNode::NODGetInputLink() {
 	return ppLINNODInputLink;
 }
 
@@ -420,7 +444,6 @@ CLink** CNode::NODGetInputLink(unsigned int* uiSize) {
  * Precondition : /
  * Postcondition : uiNODValue is returned and uiSize = uiNODOutputSize
  */
-CLink** CNode::NODGetOutputLink(unsigned int* uiSize) {
-	*uiSize = uiNODOutputSize;
+CLink** CNode::NODGetOutputLink() {
 	return ppLINNODOutputLink;
 }

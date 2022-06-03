@@ -49,12 +49,12 @@ CGraph::CGraph(const char* pcFilePath) {
     //temporary lists of link data are created in memory 
     int* piListLinkFrom = (int*)malloc(sizeof(int) * uiNbOfLink);
     if (piListLinkFrom == nullptr)
-        throw CException();
+        throw CException(EXCEPTION_MALLOC_ERROR);
 
     int* piListLinkTo = (int*)malloc(sizeof(int) * uiNbOfLink);
     if (piListLinkTo == nullptr) {
         free(piListLinkFrom);
-        throw CException();
+        throw CException(EXCEPTION_MALLOC_ERROR);
     }
 
     //Fill the previous lists
@@ -112,8 +112,23 @@ CGraph::CGraph(CGraph* pGRAToCopy) {
 
     for (unsigned int uiLoop = 0; uiLoop < pGRAToCopy->uiGRASize; uiLoop++) {
 
-        pNODGRANodeList[uiLoop] = CNode(pGRAToCopy->pNODGRANodeList[uiLoop]);
+        pNODGRANodeList[uiLoop] = CNode((unsigned int)pGRAToCopy->pNODGRANodeList[uiLoop].NODGetValue());
 
+        unsigned int uiInputLinkSize = pGRAToCopy->pNODGRANodeList[uiLoop].NODGetInputSize();
+        CLink** ppLINInputLink = pGRAToCopy->pNODGRANodeList[uiLoop].NODGetInputLink();
+        if (uiInputLinkSize > 0) {
+            for (unsigned int uiLoopLink1 = 0; uiLoopLink1 < uiInputLinkSize; uiLoopLink1++){
+                pNODGRANodeList[uiLoop].NODAddInputLink(ppLINInputLink[uiLoopLink1]->LINGetEnd());
+            }
+        }
+
+        unsigned int uiOutputLinkSize = pGRAToCopy->pNODGRANodeList[uiLoop].NODGetOutputSize();
+        CLink** ppLINOutputLink = pGRAToCopy->pNODGRANodeList[uiLoop].NODGetOutputLink();
+        if (uiOutputLinkSize > 0) {
+            for (unsigned int uiLoopLink2 = 0; uiLoopLink2 < uiOutputLinkSize; uiLoopLink2++) {
+                pNODGRANodeList[uiLoop].NODAddOutputLink(ppLINOutputLink[uiLoopLink2]->LINGetEnd());
+            }
+        }
     }
     
 
@@ -130,7 +145,6 @@ CGraph::CGraph(CGraph* pGRAToCopy) {
 CGraph* CGraph::GRAInverse() {
     //We create a new object
     CGraph* pGRANewGraph = new CGraph();
-
     pGRANewGraph->bGRAIsOriented = GRAGetIsOriented();
 
     //For each node, we recopy them all in the new graph
@@ -141,24 +155,20 @@ CGraph* CGraph::GRAInverse() {
     //Then we can create the links between the nodes
     for(unsigned int uiLoopNode = 0; uiLoopNode < uiGRASize; uiLoopNode++){
 
-        CNode* pNODCurrent = (pNODGRANodeList+uiLoopNode);
-
         //For each input on the node, we add the link reversed une our graph
-        unsigned int uiSizeLinkInput = 0;
-        CLink** ppLINInputLink = pNODCurrent->NODGetInputLink(&uiSizeLinkInput);
+        unsigned int uiSizeLinkInput = pNODGRANodeList[uiLoopNode].NODGetInputSize();
+        CLink** ppLINInputLink = pNODGRANodeList[uiLoopNode].NODGetInputLink();
 
         for (unsigned int uiLoopLinkInput = 0; uiLoopLinkInput < uiSizeLinkInput; uiLoopLinkInput++) {
-            unsigned int uiEnd = ppLINInputLink[uiLoopLinkInput]->LINGetEnd();
-            pGRANewGraph->GRAAddLinkBetweenNode(pNODCurrent->NODGetValue(), uiEnd);
+            pGRANewGraph->pNODGRANodeList[uiLoopNode].NODAddOutputLink(ppLINInputLink[uiLoopLinkInput]->LINGetEnd());
         }
 
         //For each output on the node, we add the link reversed une our graph
-        unsigned int uiSizeLinkOutput = 0;
-        CLink** ppLINOutputLink = pNODCurrent->NODGetInputLink(&uiSizeLinkInput);
+        unsigned int uiSizeLinkOutput = pNODGRANodeList[uiLoopNode].NODGetOutputSize();
+        CLink** ppLINOutputLink = pNODGRANodeList[uiLoopNode].NODGetOutputLink();
 
         for (unsigned int uiLoopLinkOutput = 0; uiLoopLinkOutput < uiSizeLinkOutput; uiLoopLinkOutput++) {
-            unsigned int uiEnd = ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd();
-            pGRANewGraph->GRAAddLinkBetweenNode(uiEnd, pNODCurrent->NODGetValue());
+            pGRANewGraph->pNODGRANodeList[uiLoopNode].NODAddInputLink(ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd());
         }
     }
     return pGRANewGraph;
@@ -205,7 +215,7 @@ void CGraph::GRAAddLinkBetweenNode(unsigned int uiValueNodeSource, unsigned int 
     pNODSource->NODAddOutputLink(pNODDestination->NODGetValue());
     pNODDestination->NODAddInputLink(pNODSource->NODGetValue());
 
-    //If the graph is oriented, create a new link in the other direction
+    //If the graph is not oriented, create a new link in the other direction
     if (bGRAIsOriented==false) {
         pNODSource->NODAddInputLink(pNODDestination->NODGetValue());
         pNODDestination->NODAddOutputLink(pNODSource->NODGetValue());
@@ -366,11 +376,11 @@ void CGraph::GRAChangeNodeValue(unsigned int uiOldValue, unsigned int uiNewValue
 
     pNODToModify->NODSetValue(uiNewValue);
 
-    unsigned int uiInputLinkSize;
-    unsigned int uiOutputLinkSize;
+    unsigned int uiInputLinkSize = pNODToModify->NODGetInputSize();
+    unsigned int uiOutputLinkSize = pNODToModify->NODGetOutputSize();
 
-    CLink** ppLINInputLinks = pNODToModify->NODGetInputLink(&uiInputLinkSize);
-    CLink** ppLINOutputLinks = pNODToModify->NODGetOutputLink(&uiOutputLinkSize);
+    CLink** ppLINInputLinks = pNODToModify->NODGetInputLink();
+    CLink** ppLINOutputLinks = pNODToModify->NODGetOutputLink();
 
     for (unsigned int uiLoop = 0; uiLoop < uiInputLinkSize; uiLoop++) {
 
@@ -423,11 +433,11 @@ void CGraph::GRARemoveNode(unsigned int uiValue) {
         throw CException(EXCEPTION_NODE_NOT_FOUND);
     }
 
-    unsigned int uiInputLinkSize;
-    unsigned int uiOutputLinkSize;
+    unsigned int uiInputLinkSize = pNODToRemove->NODGetInputSize();
+    unsigned int uiOutputLinkSize = pNODToRemove->NODGetOutputSize();
 
-    CLink** ppLINInputLinks = pNODToRemove->NODGetInputLink(&uiInputLinkSize);
-    CLink** ppLINOutputLinks = pNODToRemove->NODGetOutputLink(&uiOutputLinkSize);
+    CLink** ppLINInputLinks = pNODToRemove->NODGetInputLink();
+    CLink** ppLINOutputLinks = pNODToRemove->NODGetOutputLink();
 
     for (unsigned int uiLoop = 0; uiLoop < uiInputLinkSize; uiLoop++) {
 
