@@ -37,8 +37,6 @@ public:
 
 
 	//Getters and setters
-	void NODGetOutputListLink(int* puiListTo, unsigned int& uiLinkCreated);
-	void NODGetInputListLink(int* puiListFrom, unsigned int& uiLinkCreated);
 
 	unsigned int NODGetValue();
 	unsigned int NODGetInputSize();

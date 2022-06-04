@@ -71,33 +71,25 @@ CGraph* COperationGraph::OPEToDual(CGraph* pGRAToDual) {
 
         CNode* pNODCurrent = (pNODNodeListToDual + uiLoopNode);
 
-        int* piCurrentListLinkTo = new int[100];
-        unsigned int uiCurrentOutputLinkNb = 0;
-
-        //List of all input connections of the first node
-        pNODCurrent->NODGetOutputListLink(piCurrentListLinkTo, uiCurrentOutputLinkNb);
-
-        unsigned int uiSizeLinkOutput = pNODCurrent->NODGetOutputSize();
-        CLink** ppLINOutputLink = pNODCurrent->NODGetOutputLink();
+        unsigned int uiCurrentSizeLinkOutput = pNODCurrent->NODGetOutputSize();
+        CLink** ppLINCurrentOutputLink = pNODCurrent->NODGetOutputLink();
 
         //For each output link (== new dual node)
-        for (unsigned int uiLoopLinkOutput = 0; uiLoopLinkOutput < uiSizeLinkOutput; uiLoopLinkOutput++) {
+        for (unsigned int uiLoopLinkOutput = 0; uiLoopLinkOutput < uiCurrentSizeLinkOutput; uiLoopLinkOutput++) {
 
-            CLink* pLINCurrentLink = ppLINOutputLink[uiLoopLinkOutput];
+            CLink* pLINCurrentLink = ppLINCurrentOutputLink[uiLoopLinkOutput];
             CNode* pNODDestination = pGRAToDual->GRAGetNode(pLINCurrentLink->LINGetEnd());
             
-            int* piOtherListLinkTo = new int[100];
-            unsigned int uiOtherOutputLinkNb = 0;
-
-            //List of all connections of the second node
-            pNODDestination->NODGetOutputListLink(piOtherListLinkTo, uiOtherOutputLinkNb);
+            //All output of the other node
+            CLink** ppLINOtherListLinkTo = pNODDestination->NODGetOutputLink();
+            unsigned int uiOtherOutputLinkNb = pNODDestination->NODGetOutputSize();
 
             char* pcDualNodeValue = (char*)malloc(10 * sizeof(char));
             if (pcDualNodeValue == nullptr)
                 throw CException(EXCEPTION_MALLOC_ERROR);
 
             //Get the current dual node value
-            sprintf(pcDualNodeValue, "%d%d", pNODCurrent->NODGetValue(), ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd());
+            sprintf(pcDualNodeValue, "%d%d", pNODCurrent->NODGetValue(), pNODDestination->NODGetValue());
 
             char* pcEndPtrNewNode;
             int iCurrentNewNodeValue = strtod(pcDualNodeValue, &pcEndPtrNewNode);
@@ -106,10 +98,10 @@ CGraph* COperationGraph::OPEToDual(CGraph* pGRAToDual) {
             }
 
             //Add output links from the first old node 
-            for (unsigned int uiLoopNLink = 0; uiLoopNLink < uiCurrentOutputLinkNb; uiLoopNLink++) {
+            for (unsigned int uiLoopNLink = 0; uiLoopNLink < uiCurrentSizeLinkOutput; uiLoopNLink++) {
 
                 //If it's the current link, we continue to the next iteration
-                if (piCurrentListLinkTo[uiLoopNLink] == pNODDestination->NODGetValue())
+                if (ppLINCurrentOutputLink[uiLoopNLink]->LINGetEnd() == pNODDestination->NODGetValue())
                     continue;
 
                 //Create the value of the destination node
@@ -118,7 +110,7 @@ CGraph* COperationGraph::OPEToDual(CGraph* pGRAToDual) {
                     throw CException(EXCEPTION_MALLOC_ERROR);
 
                 //Get the destination dual node value
-                sprintf(pcDualDestinationNodeValue, "%d%d", pNODCurrent->NODGetValue(), piCurrentListLinkTo[uiLoopNLink]);
+                sprintf(pcDualDestinationNodeValue, "%d%d", pNODCurrent->NODGetValue(), ppLINCurrentOutputLink[uiLoopNLink]->LINGetEnd());
                 char* pcEndPtrNewNode;
                 int iDestinationNodeValue = strtod(pcDualDestinationNodeValue, &pcEndPtrNewNode);
                 if (pcEndPtrNewNode == pcDualNodeValue) {
@@ -137,7 +129,7 @@ CGraph* COperationGraph::OPEToDual(CGraph* pGRAToDual) {
                     throw CException(EXCEPTION_MALLOC_ERROR);
 
                 //Get the destination dual node value
-                sprintf(pcDualDestinationNodeValue, "%d%d", pNODDestination->NODGetValue(), piOtherListLinkTo[uiLoopNLink]);
+                sprintf(pcDualDestinationNodeValue, "%d%d", pNODDestination->NODGetValue(), ppLINOtherListLinkTo[uiLoopNLink]->LINGetEnd());
                 char* pcEndPtrNewNode;
                 int iDestinationNodeValue = strtod(pcDualDestinationNodeValue, &pcEndPtrNewNode);
                 if (pcEndPtrNewNode == pcDualNodeValue) {

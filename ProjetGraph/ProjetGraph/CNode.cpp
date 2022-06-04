@@ -378,48 +378,6 @@ void CNode::NODRemoveOutputLink(unsigned int uiDestination) {
 
 // ******************* GETTERS AND SETTERS					************************* //
 
-
-/**
- * Get the input list as list of number
- * Input: puiListFrom : int*, unsigned int uiLinkCreated
- * Output: /
- * Precondition : puiListFrom is allocated in memory
- * Postcondition : puiListFrom is filled with the destination value of each input link
- */
-void CNode::NODGetInputListLink(int* puiListFrom, unsigned int& uiLinkCreated) {
-
-	//From input link
-	unsigned int uiSizeLinkInput = NODGetInputSize();
-	CLink** ppLINInputLink = NODGetInputLink();
-
-	for (unsigned int uiLoopLinkInput = 0; uiLoopLinkInput < uiSizeLinkInput; uiLoopLinkInput++) {
-		puiListFrom[uiLinkCreated] = ppLINInputLink[uiLoopLinkInput]->LINGetEnd();
-		uiLinkCreated++;
-	}
-
-}
-
-
-/**
- * Get the output list as list of number
- * Input: puiListTo : int*, unsigned int uiLinkCreated
- * Output: /
- * Precondition : puiListTo is allocated in memory
- * Postcondition : puiListTo is filled with the destination value of each output link
- */
-void CNode::NODGetOutputListLink(int* puiListTo, unsigned int& uiLinkCreated) {
-
-	unsigned int uiSizeLinkOutput = NODGetOutputSize();
-	CLink** ppLINOutputLink = NODGetOutputLink();
-
-	for (unsigned int uiLoopLinkOutput = 0; uiLoopLinkOutput < uiSizeLinkOutput; uiLoopLinkOutput++) {
-		puiListTo[uiLinkCreated] = ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd();
-		uiLinkCreated++;
-	}
-
-}
-
-
 /**
  * Getter of uiNODValue
  * Input: /
