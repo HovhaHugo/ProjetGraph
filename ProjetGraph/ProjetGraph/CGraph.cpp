@@ -136,46 +136,6 @@ CGraph::CGraph(CGraph* pGRAToCopy) {
 
 
 /**
- * Function that inverte a graph (mean that each link change their start for their beginging)
- * Input: /
- * Output: /
- * Precondition : /
- * Postcondition : the graph has been inverted
- */
-CGraph* CGraph::GRAInverse() {
-    //We create a new object
-    CGraph* pGRANewGraph = new CGraph();
-    pGRANewGraph->bGRAIsOriented = GRAGetIsOriented();
-
-    //For each node, we recopy them all in the new graph
-    for (unsigned int uiLoopNode = 0; uiLoopNode < uiGRASize; uiLoopNode++) {
-        pGRANewGraph->GRAAddNode(pNODGRANodeList[uiLoopNode].NODGetValue());
-    }
-
-    //Then we can create the links between the nodes
-    for(unsigned int uiLoopNode = 0; uiLoopNode < uiGRASize; uiLoopNode++){
-
-        //For each input on the node, we add the link reversed une our graph
-        unsigned int uiSizeLinkInput = pNODGRANodeList[uiLoopNode].NODGetInputSize();
-        CLink** ppLINInputLink = pNODGRANodeList[uiLoopNode].NODGetInputLink();
-
-        for (unsigned int uiLoopLinkInput = 0; uiLoopLinkInput < uiSizeLinkInput; uiLoopLinkInput++) {
-            pGRANewGraph->pNODGRANodeList[uiLoopNode].NODAddOutputLink(ppLINInputLink[uiLoopLinkInput]->LINGetEnd());
-        }
-
-        //For each output on the node, we add the link reversed une our graph
-        unsigned int uiSizeLinkOutput = pNODGRANodeList[uiLoopNode].NODGetOutputSize();
-        CLink** ppLINOutputLink = pNODGRANodeList[uiLoopNode].NODGetOutputLink();
-
-        for (unsigned int uiLoopLinkOutput = 0; uiLoopLinkOutput < uiSizeLinkOutput; uiLoopLinkOutput++) {
-            pGRANewGraph->pNODGRANodeList[uiLoopNode].NODAddInputLink(ppLINOutputLink[uiLoopLinkOutput]->LINGetEnd());
-        }
-    }
-    return pGRANewGraph;
-}
-
-
-/**
  * Show a graph
  * Input: /
  * Output: /
@@ -517,6 +477,32 @@ CNode* CGraph::GRAGetNode(unsigned int uiNumber) {
  */
 bool CGraph::GRAGetIsOriented() {
     return bGRAIsOriented;
+}
+
+/**
+ * Setter of bGRAIsOriented
+ * Input: bOriented : bool
+ * Output: /
+ * Precondition : /
+ * Postcondition : bGRAIsOriented = bOriented
+ */
+void CGraph::GRASetIsOriented(bool bOriented) {
+    bGRAIsOriented = bOriented;
+}
+
+/**
+ * Getter of uiGRASize
+ * Input: /
+ * Output: unsigned int
+ * Precondition : /
+ * Postcondition : uiGRASize is returned
+ */
+CNode* CGraph::GRAGetNodeList() {
+    return pNODGRANodeList;
+}
+
+unsigned int CGraph::GRAGetSize() {
+    return uiGRASize;
 }
 
 

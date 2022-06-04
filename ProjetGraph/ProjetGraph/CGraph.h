@@ -30,6 +30,9 @@ public:
 
 	CNode* GRAGetNode(unsigned int uiNumber);
 	bool GRAGetIsOriented();
+	void GRASetIsOriented(bool bOriented);
+	CNode* GRAGetNodeList();
+	unsigned int GRAGetSize();
 
 };
 

@@ -143,6 +143,7 @@
     <ClCompile Include="CGraph.cpp" />
     <ClCompile Include="CLink.cpp" />
     <ClCompile Include="CNode.cpp" />
+    <ClCompile Include="COperationGraph.cpp" />
     <ClCompile Include="CParser.cpp" />
     <ClCompile Include="ProjetGraph.cpp" />
   </ItemGroup>
@@ -151,6 +152,7 @@
     <ClInclude Include="CGraph.h" />
     <ClInclude Include="CLink.h" />
     <ClInclude Include="CNode.h" />
+    <ClInclude Include="COperationGraph.h" />
     <ClInclude Include="CParser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
