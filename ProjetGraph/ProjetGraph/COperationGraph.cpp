@@ -79,6 +79,9 @@ CGraph* COperationGraph::OPEToDual(CGraph* pGRAToDual) {
 
             CLink* pLINCurrentLink = ppLINCurrentOutputLink[uiLoopLinkOutput];
             CNode* pNODDestination = pGRAToDual->GRAGetNode(pLINCurrentLink->LINGetEnd());
+
+            if (pNODCurrent->NODGetValue() > pNODDestination->NODGetValue() && pGRAToDual->GRAGetIsOriented() ==false)
+                continue;
             
             //All output of the other node
             CLink** ppLINOtherListLinkTo = pNODDestination->NODGetOutputLink();
@@ -109,8 +112,18 @@ CGraph* COperationGraph::OPEToDual(CGraph* pGRAToDual) {
                 if (pcDualDestinationNodeValue == nullptr)
                     throw CException(EXCEPTION_MALLOC_ERROR);
 
+                int temp1 = pNODCurrent->NODGetValue();
+                int temp2 = ppLINCurrentOutputLink[uiLoopNLink]->LINGetEnd();
+
+
+                if (temp1 > temp2 && pGRAToDual->GRAGetIsOriented() == false) {
+                    int t = temp1;
+                    temp1 = temp2;
+                    temp2 = t;
+                }
+
                 //Get the destination dual node value
-                sprintf(pcDualDestinationNodeValue, "%d%d", pNODCurrent->NODGetValue(), ppLINCurrentOutputLink[uiLoopNLink]->LINGetEnd());
+                sprintf(pcDualDestinationNodeValue, "%d%d", temp1, temp2);
                 char* pcEndPtrNewNode;
                 int iDestinationNodeValue = strtod(pcDualDestinationNodeValue, &pcEndPtrNewNode);
                 if (pcEndPtrNewNode == pcDualNodeValue) {
@@ -123,13 +136,26 @@ CGraph* COperationGraph::OPEToDual(CGraph* pGRAToDual) {
             //Add output links from the second old node 
             for (unsigned int uiLoopNLink = 0; uiLoopNLink < uiOtherOutputLinkNb; uiLoopNLink++) {
 
+                //If it's the current link, we continue to the next iteration
+                if (ppLINOtherListLinkTo[uiLoopNLink]->LINGetEnd() == pNODCurrent->NODGetValue())
+                    continue;
+
                 //Create the value of the destination node
                 char* pcDualDestinationNodeValue = (char*)malloc(10 * sizeof(char));
                 if (pcDualDestinationNodeValue == nullptr)
                     throw CException(EXCEPTION_MALLOC_ERROR);
 
+                int temp1 = pNODDestination->NODGetValue();
+                int temp2 = ppLINOtherListLinkTo[uiLoopNLink]->LINGetEnd();
+
+                if (temp1 > temp2 && pGRAToDual->GRAGetIsOriented() == false) {
+                    int t = temp1;
+                    temp1 = temp2;
+                    temp2 = t;
+                }
+
                 //Get the destination dual node value
-                sprintf(pcDualDestinationNodeValue, "%d%d", pNODDestination->NODGetValue(), ppLINOtherListLinkTo[uiLoopNLink]->LINGetEnd());
+                sprintf(pcDualDestinationNodeValue, "%d%d", temp1, temp2);
                 char* pcEndPtrNewNode;
                 int iDestinationNodeValue = strtod(pcDualDestinationNodeValue, &pcEndPtrNewNode);
                 if (pcEndPtrNewNode == pcDualNodeValue) {
@@ -168,6 +194,9 @@ CGraph* COperationGraph::OPECreateBlankDual(CGraph* pGRAToDual) {
 
             CLink* pLINCurrentLink = ppLINOutputLink[uiLoopLinkOutput];
             CNode* pNODDestination = pGRAToDual->GRAGetNode(pLINCurrentLink->LINGetEnd());
+
+            if (pNODCurrent->NODGetValue() > pNODDestination->NODGetValue() && pGRAToDual->GRAGetIsOriented() ==false)
+                continue;
 
             char* pcNumberNode = (char*)malloc(10 * sizeof(char));
             if (pcNumberNode == nullptr)
